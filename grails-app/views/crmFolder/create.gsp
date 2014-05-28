@@ -35,7 +35,7 @@
                     </f:field>
                 </g:if>
                 <f:field property="title">
-                    <g:textField name="title" value="${crmResourceFolder.title}" class="span8" input-autofocus=""
+                    <g:textField name="title" value="${crmResourceFolder.title}" class="span8" autofocus=""
                                  placeholder="${message(code: 'crmResourceFolder.title.placeholder', default: '')}"/>
                 </f:field>
                 <f:field property="name" input-class="span8"
