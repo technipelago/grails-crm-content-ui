@@ -82,10 +82,11 @@
         <tr>
             <td class="nowrap">
                 <img src="${crm.fileIcon(contentType: metadata.contentType)}"
-                     alt="${metadata.contentType}"
-                     title="${metadata.contentType}"/>
-                <g:link controller="crmContent" action="show"
-                        id="${res.id}">${res.title.encodeAsHTML()}</g:link>
+                     alt="${metadata.contentType}" title="${metadata.contentType}"/>
+                <g:link controller="crmContent" action="open" id="${res.id}" target="${controllerName}_doc"
+                        title="${message(code: 'crmContent.open.help', default: 'Open Document')}">
+                    ${res.title.encodeAsHTML()}
+                </g:link>
             </td>
             <td>
                 ${res.name?.encodeAsHTML()}
@@ -93,7 +94,17 @@
             <td class="nowrap"><g:formatDate date="${metadata.modified ?: metadata.created}" type="datetime"/></td>
             <td class="nowrap" style="text-align: right;">${metadata.size}</td>
             <td>
-                <g:if test="${res.shared}"><i class="icon-share"></i></g:if>
+                <g:if test="${res.shared}">
+                    <crm:resourceLink resource="${res}" target="_blank"><i
+                            class="icon-share-alt"></i></crm:resourceLink>
+                </g:if>
+                <crm:hasPermission permission="${controllerName + ':edit'}">
+                    <g:link controller="crmContent" action="edit"
+                            params="${[id: res.id, referer: request.forwardURI]}"
+                            title="${message(code: 'crmContent.edit.help', default: 'Edit Document')}">
+                        <i class="icon-pencil"></i>
+                    </g:link>
+                </crm:hasPermission>
             </td>
         </tr>
     </g:each>
