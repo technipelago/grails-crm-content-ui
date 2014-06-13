@@ -144,8 +144,7 @@
                 </g:else>
 
                 <g:if test="${gallery && list}">
-                    <g:link mapping="${gallery}" class="btn btn-info"
-                            params="${[id: bean.id, created: bean.dateCreated.time]}">
+                    <g:link mapping="gallery" class="btn btn-info" params="${gallery}">
                         <i class="icon-picture icon-white"></i>
                         <g:message code="crmContent.photo.gallery.label" default="Photo Gallery"/>
                     </g:link>
