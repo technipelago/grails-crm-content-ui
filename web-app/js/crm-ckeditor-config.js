@@ -15,6 +15,7 @@ CKEDITOR.editorConfig = function( config ) {
         ['Undo', 'Redo'],
         ['Source']
     ];
+    config.allowedContent = true;
     config.basicEntities = false;
     config.protectedSource = [/\[@link\s+[\s\S]*?\[\/@link\]/g, /\[#[\s\S]*?\]/g];
 };
