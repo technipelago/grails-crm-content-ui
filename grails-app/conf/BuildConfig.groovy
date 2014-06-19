@@ -39,12 +39,12 @@ grails.project.dependency.resolution = {
 
         compile "grails.crm:crm-core:latest.integration"
         compile "grails.crm:crm-content:latest.integration"
-        runtime "grails.crm:crm-security:latest.integration"
-        runtime "grails.crm:crm-tags:latest.integration"
-        runtime "grails.crm:crm-ui-bootstrap:latest.integration"
+        compile "grails.crm:crm-security:latest.integration"
+        compile "grails.crm:crm-tags:latest.integration"
+        compile "grails.crm:crm-ui-bootstrap:latest.integration"
 
-        runtime ":decorator:latest.integration"
-        runtime ":ckeditor:3.6.3.0"
+        compile ":decorator:latest.integration"
+        compile ":ckeditor:4.4.1.0"
     }
 }
 

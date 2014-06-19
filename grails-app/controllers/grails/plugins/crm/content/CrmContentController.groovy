@@ -41,9 +41,11 @@ class CrmContentController {
 
     def create(String ref, String referer, String contentType, String name, String text) {
         def reference = crmCoreService.getReference(ref)
+        def css = grailsApplication.config.crm.content.editor.css
         switch (request.method) {
             case "GET":
-                [contentType: contentType, ref: ref, reference: reference, referer: referer, text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.']
+                [contentType: contentType, ref: ref, reference: reference, referer: referer, css: css,
+                 text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.']
                 break
             case "POST":
                 if (!name) {

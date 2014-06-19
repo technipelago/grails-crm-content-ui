@@ -7,28 +7,19 @@
     <ckeditor:resources/>
     <r:script>
         $(document).ready(function () {
+            var stylesheet = ["${resource(dir: 'less', file: 'bootstrap.less.css', plugin: 'twitter-bootstrap')}",
+            "${resource(dir: 'less', file: 'crm-ui-bootstrap.less.css', plugin: 'crm-ui-bootstrap')}",
+            "${resource(dir: 'less', file: 'responsive.less.css', plugin: 'twitter-bootstrap')}"];
+            <% if (css) { %>
+            stylesheet.push("${resource(css)}");
+            <% } %>
             var editor = CKEDITOR.replace('content',
-                    {
-                        width: '98.3%',
-                        height: '480px',
-                        resize_enabled: true,
-                        startupFocus: true,
-                        skin: 'kama',
-                        toolbar: [
-                            ['Styles', 'Format', 'Font', 'FontSize'],
-                            ['Source'],
-                            '/',
-                            ['Bold', 'Italic', 'Underline', 'Strike', 'TextColor', 'BGColor', 'RemoveFormat'],
-                            ['Paste', 'PasteText', 'PasteFromWord'],
-                            ['JustifyLeft', 'JustifyCenter', 'JustifyRight'],
-                            ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent'],
-                            ['Link', 'Unlink'], /* Image upload is not available until document is created */
-                            ['Table', 'HorizontalRule']
-                        ],
-                        basicEntities: false,
-                        protectedSource: [/\[@link\s+[\s\S]*?\[\/@link\]/g, /\[#[\s\S]*?\]/g],
-                        baseHref: "${createLink(controller:'static')}"
-                    });
+                {
+                    customConfig: "${resource(dir: 'js', file: 'crm-ckeditor-config.js', plugin: 'crm-content-ui')}",
+                    stylesSet: "crm-web-styles:${resource(dir: 'js', file: 'crm-ckeditor-styles.js', plugin: 'crm-content-ui')}",
+                    baseHref: "${createLink(controller: 'static')}",
+                    contentsCss: stylesheet
+                });
         });
     </r:script>
     <% } %>
@@ -50,7 +41,8 @@
 
     <div class="form-actions">
         <crm:button visual="success" icon="icon-ok icon-white" label="crmContent.button.save.label"/>
-        <g:textField name="name" required="" class="input-large" placeholder="Filnamn" style="margin-top: 9px;margin-left:5px;"/>
+        <g:textField name="name" required="" class="input-large" placeholder="Filnamn"
+                     style="margin-top: 9px;margin-left:5px;"/>
     </div>
 </g:form>
 </body>
