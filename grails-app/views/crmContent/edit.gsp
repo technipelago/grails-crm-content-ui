@@ -32,7 +32,7 @@
                 contentsCss: stylesheet,
                 filebrowserBrowseUrl: "${createLink(controller: 'crmContent', action: 'browse', params: [reference: 'crmResourceRef@' + crmResourceRef.ident()])}",
                 filebrowserUploadUrl: "${createLink(controller: 'crmContent', action: 'upload')}",
-                filebrowserImageBrowseUrl: "${createLink(controller: 'crmContent', action: 'browse', params: [reference: 'crmResourceRef@' + crmResourceRef.ident()])}",
+                filebrowserImageBrowseUrl: "${createLink(controller: 'crmContent', action: 'browse', params: [pattern: 'image', reference: 'crmResourceRef@' + crmResourceRef.ident()])}",
                 filebrowserImageUploadUrl: "${createLink(controller: 'crmContent', action: 'upload')}"
             });
         });
