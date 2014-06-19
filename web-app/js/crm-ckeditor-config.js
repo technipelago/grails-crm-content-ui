@@ -1,6 +1,6 @@
 CKEDITOR.editorConfig = function( config ) {
     config.width = '98.3%';
-    config.height = '480px';
+    config.height = '400px';
     config.resize_enabled = true;
     config.startupFocus = true;
     config.toolbar = [
