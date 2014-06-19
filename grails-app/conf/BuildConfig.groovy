@@ -35,8 +35,6 @@ grails.project.dependency.resolution = {
         test(":codenarc:0.21") { export = false }
         test(":code-coverage:1.2.7") { export = false }
 
-        runtime ":cache-ehcache:1.0.0"
-
         compile "grails.crm:crm-core:latest.integration"
         compile "grails.crm:crm-content:latest.integration"
         compile "grails.crm:crm-security:latest.integration"
