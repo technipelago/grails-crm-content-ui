@@ -41,7 +41,7 @@ grails.project.dependency.resolution = {
         compile "grails.crm:crm-tags:latest.integration"
         compile "grails.crm:crm-ui-bootstrap:latest.integration"
 
-        compile ":decorator:latest.integration"
+        compile ":decorator:1.1"
         compile ":ckeditor:4.4.1.0"
     }
 }
