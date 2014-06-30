@@ -15,6 +15,8 @@
  */
 package grails.plugins.crm.content
 
+import javax.servlet.http.HttpServletResponse
+
 import static javax.servlet.http.HttpServletResponse.SC_OK
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND
 
@@ -101,7 +103,9 @@ class CrmFolderController {
             }
         }
 
-        [crmResourceFolder: crmResourceFolder, parentList: CrmResourceFolder.findAllByTenantId(TenantUtils.tenant).sort { it.path.join('/') }]
+        [crmResourceFolder: crmResourceFolder, parentList: CrmResourceFolder.findAllByTenantId(TenantUtils.tenant).sort {
+            it.path.join('/')
+        }]
     }
 
     def upload() {
@@ -111,32 +115,97 @@ class CrmFolderController {
             redirect action: 'index'
             return
         }
-
-        def fileItem = request.getFile("file")
-        if (fileItem?.isEmpty()) {
-            flash.error = message(code: "crmContent.upload.empty", default: "You must select a file to upload")
-        } else if (fileItem) {
-            try {
-                def opts = [:]
-                if (params.status) {
-                    opts.status = params.status
-                } else if (crmResourceFolder.shared) {
-                    opts.status = 'shared'
-                } else {
-                    opts.status = 'published'
+        if (request.xhr) {
+            def files = []
+            def fileItem = request.getFile("file")
+            if (fileItem?.isEmpty()) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST)
+                return
+            } else if (fileItem) {
+                try {
+                    def opts = [:]
+                    if (params.status) {
+                        opts.status = params.status
+                    } else if (crmResourceFolder.shared) {
+                        opts.status = 'shared'
+                    } else {
+                        opts.status = 'published'
+                    }
+                    def resource = crmContentService.createResource(fileItem.inputStream, fileItem.originalFilename, fileItem.size, fileItem.contentType, crmResourceFolder, opts)
+                    files << [name: resource.name,
+                              size: resource.metadata.bytes,
+                              url: createLink(controller: 'crmContent', action: 'open', id: resource.id),
+                              thumbnailUrl: createLink(controller: 'crmContent', action: 'open', id: resource.id),
+                              deleteUrl: createLink(controller: 'crmFolder', action: 'deleteFile', id: resource.id),
+                              deleteType: "DELETE"
+                    ]
+                } catch (Exception e) {
+                    files << [name: fileItem.originalFilename, size: fileItem.size, error: e.message]
                 }
-                def ref = crmContentService.createResource(fileItem, crmResourceFolder, opts)
-                flash.success = message(code: "crmContent.upload.success", args: [ref.toString()], default: "Resource [{0}] uploaded")
-            } catch (Exception e) {
-                log.error("Failed to upload file: ${fileItem.originalFilename}", e)
-                flash.error = message(code: "crmContent.upload.error", args: [fileItem.originalFilename], default: "Failed to upload file {0}")
+            }
+            def result = [files: files]
+            render result as JSON
+        } else {
+            def fileItem = request.getFile("file")
+            if (fileItem?.isEmpty()) {
+                flash.error = message(code: "crmContent.upload.empty", default: "You must select a file to upload")
+            } else if (fileItem) {
+                try {
+                    def opts = [:]
+                    if (params.status) {
+                        opts.status = params.status
+                    } else if (crmResourceFolder.shared) {
+                        opts.status = 'shared'
+                    } else {
+                        opts.status = 'published'
+                    }
+                    def ref = crmContentService.createResource(fileItem, crmResourceFolder, opts)
+                    flash.success = message(code: "crmContent.upload.success", args: [ref.toString()], default: "Resource [{0}] uploaded")
+                } catch (Exception e) {
+                    log.error("Failed to upload file: ${fileItem.originalFilename}", e)
+                    flash.error = message(code: "crmContent.upload.error", args: [fileItem.originalFilename], default: "Failed to upload file {0}")
+                }
+            }
+
+            if (params.referer) {
+                redirect(url: params.referer)
+            } else {
+                redirect(action: "show", id: params.id)
             }
         }
+    }
 
-        if (params.referer) {
-            redirect(url: params.referer)
+    def deleteFile() {
+        def idList = params.list('id')
+        def folderId
+        def files = []
+
+        for(id in idList) {
+            def res = CrmResourceRef.findByIdAndTenantId(id, TenantUtils.tenant)
+            if (!res) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND)
+                return
+            }
+            if(! folderId) {
+                folderId = res.reference?.id
+            }
+            def filename = res.name
+            crmContentService.deleteReference(res)
+            files << filename
+        }
+
+        if(request.xhr) {
+            def result = [files: files.collect{[(it): true]}]
+            render result as JSON
         } else {
-            redirect(action: "show", id: params.id)
+            flash.warning = message(code: 'crmResourceRef.deleted.message',
+                    args: [message(code: 'crmResourceRef.label', default: 'Content'), files.join(', ')],
+                    default: "Resource [{1}] deleted")
+            if (params.referer) {
+                redirect(url: params.referer - request.contextPath)
+            } else {
+                redirect(controller: "crmFolder", action: folderId ? "show" : "index", id: folderId)
+            }
         }
     }
 
@@ -162,7 +231,7 @@ class CrmFolderController {
         switch (request.method) {
             case 'GET':
                 return [crmResourceFolder: crmResourceFolder, parentList: possibleParents,
-                        folders: crmResourceFolder.folders, files: crmResourceFolder.files]
+                        folders          : crmResourceFolder.folders, files: crmResourceFolder.files]
             case 'POST':
                 if (params.version) {
                     def version = params.version.toLong()
@@ -171,7 +240,7 @@ class CrmFolderController {
                                 [message(code: 'crmResourceFolder.label', default: 'Folder')] as Object[],
                                 "Another user has updated this Folder while you were editing")
                         render view: 'edit', model: [crmResourceFolder: crmResourceFolder, parentList: possibleParents,
-                                folders: crmResourceFolder.folders, files: crmResourceFolder.files]
+                                                     folders          : crmResourceFolder.folders, files: crmResourceFolder.files]
                         return
                     }
                 }
@@ -181,7 +250,7 @@ class CrmFolderController {
 
                 if (!crmResourceFolder.save(flush: true)) {
                     render view: 'edit', model: [crmResourceFolder: crmResourceFolder, parentList: possibleParents,
-                            folders: crmResourceFolder.folders, files: crmResourceFolder.files]
+                                                 folders          : crmResourceFolder.folders, files: crmResourceFolder.files]
                     return
                 }
 
@@ -195,7 +264,7 @@ class CrmFolderController {
         if (parentId) {
             def parent = CrmResourceFolder.get(Long.valueOf(parentId))
             if (parent != null && parent.tenantId == crmResourceFolder.tenantId) {
-                if (possibleParents.find{it.id == parent.id}) {
+                if (possibleParents.find { it.id == parent.id }) {
                     crmResourceFolder.parent = parent
                 } else {
                     log.warn("Folder \"$parent\" [${parent.id}] cannot be parent of \"$crmResourceFolder\" [${crmResourceFolder.id}]")
@@ -215,7 +284,8 @@ class CrmFolderController {
             return
         }
         def files = crmResourceFolder.files ?: []
-        [crmResourceFolder: crmResourceFolder, folders: crmResourceFolder.folders, files: files]
+        def uploadMultiple = grailsApplication.config.crm.content.upload.multiple ?: false
+        [crmResourceFolder: crmResourceFolder, folders: crmResourceFolder.folders, files: files, multiple: uploadMultiple]
     }
 
     def delete(Long id) {

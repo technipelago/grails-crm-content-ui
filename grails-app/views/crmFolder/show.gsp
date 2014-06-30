@@ -4,6 +4,47 @@
     <meta name="layout" content="main">
     <g:set var="entityName" value="${message(code: 'crmResourceFolder.label', default: 'Folder')}"/>
     <title><g:message code="crmResourceFolder.label" args="[entityName, crmResourceFolder]"/></title>
+    <% if(multiple) { %>
+    <r:require module="fileupload"/>
+    <% } %>
+    <r:script>
+        $(document).ready(function() {
+            'use strict';
+            <% if(multiple) { %>
+            var url = "${createLink(controller: 'crmFolder', action: 'upload', params: [id: crmResourceFolder.id, referer: "${createLink(action: 'show', id: crmResourceFolder.id)}"])}";
+            $('#fileupload').fileupload({
+                url: url,
+                dataType: 'json',
+                autoUpload: true,
+                sequentialUploads: false,
+                limitConcurrentUploads: 3,
+                maxFileSize: 5000000, // 5 MB
+                disableImageResize: /Android(?!.*Chrome)|Opera/.test(window.navigator && navigator.userAgent),
+                imageMaxWidth: <%=imageMaxWidth ?: 1920%>,
+                imageMaxHeight: <%=imageMaxHeight ?: 1080%>,
+                imageCrop: false
+            }).on('fileuploadstart', function (e) {
+                $('#progress').show();
+            }).on('fileuploadstop', function (e) {
+                setTimeout(function() { location.reload(); }, 3000);
+            }).on('fileuploadprogressall', function (e, data) {
+                var progress = parseInt(data.loaded / data.total * 100, 10);
+                $('#progress .bar').css('width', progress + '%');
+            }).on('fileuploadfail', function (e, data) {
+                $('#progress').hide();
+                $.each(data.files, function (index, file) {
+                    var error = $('<span class="label label-important"/>').text('File upload failed for ' + file);
+                    $("#crm-content-list").append(error);
+                });
+            }).prop('disabled', !$.support.fileInput).parent().addClass($.support.fileInput ? undefined : 'disabled');
+            <% } %>
+            $("#select-all-files").click(function (event) {
+                var check = $(this).is(":checked");
+                var $table = $(this).closest('table');
+                $(":checkbox[name='id']", $table).prop('checked', check);
+            });
+        });
+    </r:script>
 </head>
 
 <body>
@@ -111,6 +152,11 @@
     </tbody>
 </table>
 
+
+<div id="progress" class="progress progress-info progress-striped hide">
+    <div class="bar" style="width: 0%;"></div>
+</div>
+
 <g:uploadForm>
     <g:hiddenField name="id" value="${crmResourceFolder?.id}"/>
     <g:hiddenField name="selected" value="${selected?.id}"/>
@@ -159,10 +205,20 @@
             </ul>
         </crm:button>
         <crm:hasPermission permission="crmContent:edit">
-            <crm:button action="upload" icon="icon-upload"
-                        label="crmContent.button.upload.label"
-                        title="crmContent.button.upload.help"/>
-            <input type="file" name="file" style="margin-left: 10px;"/>
+
+            <g:if test="${multiple}">
+                <span class="btn btn-primary fileinput-button">
+                    <i class="icon-upload icon-white"></i>
+                    <span><g:message code="crmContent.button.upload.label" default="Add files..."/></span>
+                    <input id="fileupload" type="file" name="file" style="margin-left:10px;" multiple="">
+                </span>
+            </g:if>
+            <g:else>
+                <crm:button action="upload" visual="primary" icon="icon-upload icon-white"
+                            label="crmContent.button.upload.label"/>
+                <input type="file" name="file" style="margin-left:10px;"/>
+            </g:else>
+
         </crm:hasPermission>
 
         <g:if test="${folders || files}">
