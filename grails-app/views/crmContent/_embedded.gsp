@@ -20,7 +20,7 @@
         }).on('fileuploadstart', function (e) {
             $('#progress').show();
         }).on('fileuploadstop', function (e) {
-            setTimeout(function() { location.reload(); }, 5000);
+            setTimeout(function() { location.reload(); }, 3000);
         }).on('fileuploadprogressall', function (e, data) {
             var progress = parseInt(data.loaded / data.total * 100, 10);
             $('#progress .bar').css('width', progress + '%');
