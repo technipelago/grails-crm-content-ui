@@ -18,8 +18,20 @@
 
             <fieldset>
                 <f:with bean="cmd">
-                    <f:field property="name" label="crmContentQueryCommand.name.label" input-autofocus="" input-class="span6"
-                             input-placeholder="${message(code: 'crmContentQueryCommand.name.placeholder', default: '')}"/>
+                    <div class="row-fluid">
+                        <div class="span6">
+                            <f:field property="name" label="crmContentQueryCommand.name.label" input-autofocus=""
+                                     input-class="span11"
+                                     input-placeholder="${message(code: 'crmContentQueryCommand.name.placeholder', default: '')}"/>
+                        </div>
+
+                        <div class="span6">
+                            <f:field property="name" label="crmContentQueryCommand.tags.label"
+                                     input-class="span11"
+                                     input-placeholder="${message(code: 'crmContentQueryCommand.tags.placeholder', default: '')}"/>
+                        </div>
+                    </div>
+
                 </f:with>
             </fieldset>
 

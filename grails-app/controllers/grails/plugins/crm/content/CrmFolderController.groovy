@@ -63,22 +63,20 @@ class CrmFolderController {
             case 'POST':
                 uri = selectionService.addQuery(baseURI, query)
                 WebUtils.setTenantData(request, 'crmContentQuery', query)
-                redirect(action: "list", params: selectionService.createSelectionParameters(uri))
-                return
         }
 
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
 
         try {
             def result = selectionService.select(uri, params)
-            if (result.size() == 1) {
+            if (result.totalCount == 1) {
                 // If we only got one record, show the record immediately.
                 redirect action: "show", params: selectionService.createSelectionParameters(uri) + [id: result.head().ident()]
             } else {
                 return [crmContentList: result, crmContentTotal: result.totalCount, selection: uri]
             }
         } catch (Exception e) {
-            log.error(e)
+            log.error("Failed to execute query [$uri]", e)
             flash.error = e.message
             [crmContentList: [], crmContentTotal: 0, selection: uri]
         }
