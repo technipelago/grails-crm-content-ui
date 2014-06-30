@@ -1,8 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
-    <meta name="layout" content="main"/>
-    <title>${bean.encodeAsHTML()}</title>
+    <meta name="layout" content="${grailsApplication.config.crm.content.cms.layout ?: 'main'}"/>
+    <title><g:message code="crmContent.photo.gallery.title" default="Gallery - {0}" args="${[bean]}"/></title>
     <r:require module="gallery"/>
     <r:script>
         document.getElementById('links').onclick = function (event) {
@@ -24,7 +24,7 @@
 <body>
 <div class="row-fluid">
     <div class="span10 offset1">
-        <h1>${bean.encodeAsHTML()}</h1>
+        <h1><g:message code="crmContent.photo.gallery.title" default="Gallery - {0}" args="${[bean]}"/></h1>
 
         <div id="links" class="row-fluid">
             <g:each in="${result}" var="photo">
