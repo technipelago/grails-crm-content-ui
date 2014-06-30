@@ -21,5 +21,14 @@ class CrmContentUiUrlMappings {
             controller = "crmContent"
             action = "show"
         }
+        "/g/$t/$domain/$id" {
+            controller = "crmGallery"
+            action = "index"
+            constraints {
+                t(matches: /\d+/)
+                domain(matches: /\w+/)
+                id(matches: /\d+/)
+            }
+        }
     }
 }
