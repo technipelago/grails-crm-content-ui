@@ -14,4 +14,9 @@ modules = {
         resource url: "js/jquery.fileupload-image.js", attrs: [order: 60]
         resource url: "js/canvas-to-blob.min.js", attrs: [order: 70]
     }
+    gallery {
+        dependsOn 'jquery'
+        resource url: 'css/blueimp-gallery.css'
+        resource url: 'js/blueimp-gallery.js'
+    }
 }
