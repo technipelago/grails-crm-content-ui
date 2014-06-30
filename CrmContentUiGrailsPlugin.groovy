@@ -18,7 +18,7 @@ import grails.plugins.crm.content.CrmResourceRef
 
 class CrmContentUiGrailsPlugin {
     def groupId = "grails.crm"
-    def version = "1.2.14"
+    def version = "1.2.15"
     def grailsVersion = "2.2 > *"
     def dependsOn = [:]
     def loadAfter = ['crmContent']
@@ -48,8 +48,8 @@ This plugin depends on the base plugin crm-content that provide low level conten
             permissions {
                 guest "crmFolder:index,list,show,clearQuery", "crmContent:show,preview,open"
                 partner "crmFolder:index,list,show,clearQuery", "crmContent:show,preview,open"
-                user "crmFolder,crmContent:*", "*:attachDocument,deleteDocument"
-                admin "crmFolder,crmContent:*"
+                user "crmFolder,crmContent,crmGallery:*", "*:attachDocument,deleteDocument"
+                admin "crmFolder,crmContent,crmGallery:*"
             }
             statistics { tenant ->
                 def total = CrmResourceRef.countByTenantId(tenant)
