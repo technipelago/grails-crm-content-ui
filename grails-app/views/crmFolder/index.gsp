@@ -26,7 +26,7 @@
                         </div>
 
                         <div class="span6">
-                            <f:field property="name" label="crmContentQueryCommand.tags.label"
+                            <f:field property="tags" label="crmContentQueryCommand.tags.label"
                                      input-class="span11"
                                      input-placeholder="${message(code: 'crmContentQueryCommand.tags.placeholder', default: '')}"/>
                         </div>
