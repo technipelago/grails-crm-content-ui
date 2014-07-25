@@ -14,3 +14,7 @@ With CRM we mean features like:
 ## Content Management User Inteface Plugin
 This plugin provides admin user interface for managing content in GR8 CRM.
 Content can be any type of file, for example Text, Microsoft Word, PDF, and images.
+
+### Documentation
+
+Complete documentation for this plugin can be found at [gr8crm.github.io](http://gr8crm.github.io/plugins/crm-content-ui/)
