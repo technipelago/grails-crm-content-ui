@@ -26,7 +26,7 @@ class CrmContentUiGrailsPlugin {
             "grails-app/views/crmContent/test.gsp",
             "grails-app/views/error.gsp"
     ]
-    def title = "Content Admin User Interface for GR8 CRM"
+    def title = "Content Admin UI for GR8 CRM"
     def author = "Goran Ehrsson"
     def authorEmail = "goran@technipelago.se"
     def description = '''\
@@ -35,7 +35,7 @@ Content can be any type of media like plain text, Microsoft Word, PDF, and image
 Content can be stored in folders or attached to any type of domain instance.
 This plugin depends on the base plugin crm-content that provide low level content services.
 '''
-    def documentation = "http://grails.org/plugin/crm-content-ui"
+    def documentation = "http://gr8crm.github.io/plugins/crm-content-ui/"
     def license = "APACHE"
     def organization = [name: "Technipelago AB", url: "http://www.technipelago.se/"]
     def issueManagement = [system: "github", url: "https://github.com/technipelago/grails-crm-content-ui/issues"]
