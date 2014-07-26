@@ -18,7 +18,8 @@
                     customConfig: "${resource(dir: 'js', file: 'crm-ckeditor-config.js', plugin: 'crm-content-ui')}",
                     stylesSet: "crm-web-styles:${resource(dir: 'js', file: 'crm-ckeditor-styles.js', plugin: 'crm-content-ui')}",
                     baseHref: "${createLink(controller: 'static')}",
-                    contentsCss: stylesheet
+                    contentsCss: stylesheet,
+                    language: 'en'
                 });
         });
     </r:script>
@@ -41,7 +42,8 @@
 
     <div class="form-actions">
         <crm:button visual="success" icon="icon-ok icon-white" label="crmContent.button.save.label"/>
-        <g:textField name="name" required="" class="input-large" placeholder="Filnamn"
+        <g:textField name="name" required="" class="input-large"
+                     placeholder="${message(code: 'crmContent.filename.label', default: 'Filename')}"
                      style="margin-top: 9px;margin-left:5px;"/>
     </div>
 </g:form>

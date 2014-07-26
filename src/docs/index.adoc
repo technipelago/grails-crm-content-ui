@@ -34,6 +34,81 @@ that focus on one specific domain, for example *contact*, *project* or *document
 
 This plugin provide a Twitter Bootstrap user interface for authoring content in {gr8crm} applications.
 
+== Groovy Server Pages
+
+This section describes some useful Groovy Server Pages (GSP) included in this plugin, pages used for Content Management.
+
+=== Attach documents to domain instances
+
++crmContent/_embedded.gsp+
+
+If you have a page that shows information in tabs you can add an extra tab that display attachments.
+In this tab you can also let users upload files and even create new files attached to a domain instance.
+
+The tab looks like this:
+
+image::crm-content-tab.png[The content tab, role="thumb"]
+
+As you can see the *Files (5)* tab displays existing attachments and also has buttons for creating and uploading new content.
+
+To insert the extra tab in a .gsp page without modifying the .gsp source you include the following code in +BootStrap.groovy+.
+
+[source,groovy]
+.BootStrap.groovy
+----
+class BootStrap {
+
+    def crmCoreService
+    def crmPluginService
+    def crmContentService
+
+    def init = { servletContext ->
+
+        crmPluginService.registerView('crmContact', 'show', 'tabs',   // <1>
+            [id: "documents",
+                index: 500,     // <2>
+                label: "crmContact.tab.documents.label",
+                template: '/crmContent/embedded',
+                plugin: "crm-content-ui",
+                model: {
+                    def id = crmCoreService.getReferenceIdentifier(crmContact)  // <3>
+                    def result = crmContentService.findResourcesByReference(crmContact) // <4>
+                    return [bean: crmContact, list: result, totalCount: result.size(),
+                            reference: id, openAction: 'show']
+                } // <5>
+            ]
+        )
+    }
+}
+----
+<1> Add the tab to crmContact/show.gsp
+<2> Tab order, lower number tabs are inserted to the left of higher number tabs.
+<3> The reference identifier is used to create a *dynamic relation* between the attachment and the domain instance.
+<4> Find existing files attached to the domain instance so the inserted view/tab can list them.
+<5> The +model+ Closure have access to page scope in crmContact/show.gsp and can therefore reference the domain instance *crmContact*.
+
+=== Working with folders and files
+
++crmFolder/list.gsp+
+
+Included in this plugin is a simple File Manager. The +list+ action in +CrmFolderController+ displays folders and files.
+Users can create new folders and upload files. It is also possible to create new TEXT and HTML files using an embedded Rich Text editor.
+
+image::crm-filemanager.png[The file manager, role="thumb"]
+
+=== Create a new HTML file
+
++crmContent/create.gsp+
+
+The +create+ action in +CrmContentController+ displays an embedded Rich Text editor (ckEditor) that lets the user create
+a new HTML document.
+
+image::crm-html-editor.png[Rich Text Editor, role="thumb"]
+
+The +create+ action takes a parameter +ref+ that should contain a *Reference Identifier* to the domain instance
+that the new content should be attached to.
+For example +crmContent/create?ref=crmResourceFolder@42+ would attach the newly created file to a folder with id 42.
+
 == License
 
 {license}
