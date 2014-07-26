@@ -17,12 +17,13 @@
 import grails.plugins.crm.content.CrmResourceRef
 
 class CrmContentUiGrailsPlugin {
-    def groupId = "grails.crm"
-    def version = "1.2.16"
+    def groupId = ""
+    def version = "2.0.0"
     def grailsVersion = "2.2 > *"
     def dependsOn = [:]
     def loadAfter = ['crmContent']
     def pluginExcludes = [
+            "src/groovy/grails/plugins/crm/content/CrmContentUiTestSecurityDelegate.groovy",
             "grails-app/views/crmContent/test.gsp",
             "grails-app/views/error.gsp"
     ]
