@@ -25,7 +25,7 @@ import grails.plugins.crm.core.CrmSecurityDelegate
  * @author Goran Ehrsson
  * @since 1.0
  */
-class TestSecurityDelegate implements CrmSecurityDelegate {
+class CrmContentUiTestSecurityDelegate implements CrmSecurityDelegate {
 
     def users = [:]
     def current = 'nobody'
