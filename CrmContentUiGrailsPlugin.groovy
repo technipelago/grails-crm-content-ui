@@ -27,7 +27,7 @@ class CrmContentUiGrailsPlugin {
             "grails-app/views/crmContent/test.gsp",
             "grails-app/views/error.gsp"
     ]
-    def title = "Content Admin UI for GR8 CRM"
+    def title = "Content Management User Interface for GR8 CRM"
     def author = "Goran Ehrsson"
     def authorEmail = "goran@technipelago.se"
     def description = '''\
