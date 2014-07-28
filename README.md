@@ -1,4 +1,4 @@
-# GR8 CRM - Content Management User Inteface Plugin
+# GR8 CRM - Content Management User Interface Plugin
 
 CRM = [Customer Relationship Management](http://en.wikipedia.org/wiki/Customer_relationship_management)
 
@@ -11,7 +11,7 @@ With CRM we mean features like:
 - Project Management
 
 
-## Content Management User Inteface Plugin
+## Content Management User Interface Plugin
 This plugin provides admin user interface for managing content in GR8 CRM.
 Content can be any type of file, for example Text, Microsoft Word, PDF, and images.
 
