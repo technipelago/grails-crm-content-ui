@@ -133,6 +133,28 @@ class CrmContentController {
                     return
                 }
 
+                def existing = crmResourceRef.getTagValue()
+                def tags = params.tags
+                if(tags) {
+                    tags = tags.split(',').findAll { it.trim() } // Convert to list with non-empty elements
+                    // Removed tags
+                    for(t in existing) {
+                        if(! tags.contains(t)) {
+                            crmResourceRef.deleteTagValue(t)
+                        }
+                    }
+                    for(t in tags) {
+                        if(! existing.contains(t)) {
+                            crmResourceRef.setTagValue(t)
+                        }
+                    }
+                } else if(existing) {
+                     // Delete all existing tags
+                    for(t in existing) {
+                        crmResourceRef.deleteTagValue(t)
+                    }
+                }
+
                 def fileItem = request.getFile("file")
                 if (fileItem && !fileItem.isEmpty()) {
                     try {

@@ -5,6 +5,7 @@
     <g:set var="entityName" value="${message(code: 'crmResourceRef.label', default: 'Content')}"/>
     <g:set var="metadata" value="${crmResourceRef.metadata}"/>
     <title><g:message code="crmResourceRef.edit.title" args="[entityName, crmResourceRef]"/></title>
+    <r:require module="select2"/>
     <% if (metadata.contentType == 'text/html') { %>
     <ckeditor:resources/>
     <r:script>
@@ -38,6 +39,14 @@
         });
     </r:script>
     <% } %>
+    <r:script>
+        $(document).ready(function() {
+            $("#inputTags").select2({
+                tags: [],
+                tokenSeparators: [",", " "]
+            });
+        });
+    </r:script>
 </head>
 
 <body>
@@ -145,8 +154,15 @@
                         </div>
 
                         <div class="span4">
-                            <f:field property="description" input-class="span12" input-rows="8"
+                            <f:field property="description" input-class="span12" input-rows="4"
                                      input-placeholder="${message(code: 'crmResourceRef.description.placeholder', default: '')}"/>
+
+                            <div class="control-group">
+                                <label for="inputTags" class="control-label"><g:message code="crmTag.list.label" default="Tags"/></label>
+                                <div class="controls">
+                                    <input type="hidden" id="inputTags" name="tags" value="${crmResourceRef.getTagValue()?.join(',')}" class="input-large">
+                                </div>
+                            </div>
                         </div>
                     </f:with>
                 </div>
