@@ -1,3 +1,4 @@
+<%@ page import="grails.plugins.crm.content.CrmResourceRef" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -41,9 +42,16 @@
     <% } %>
     <r:script>
         $(document).ready(function() {
-            $("#inputTags").select2({
-                tags: [],
-                tokenSeparators: [",", " "]
+            $.ajax({
+                cache: false,
+                url: "${createLink(controller: 'crmTag', action: 'autocomplete', params: [entity: CrmResourceRef.name])}",
+                dataType: "json",
+                success: function(tags) {
+                    $("#inputTags").select2({
+                        tags: tags,
+                        tokenSeparators: [",", " "]
+                    });
+                }
             });
         });
     </r:script>
