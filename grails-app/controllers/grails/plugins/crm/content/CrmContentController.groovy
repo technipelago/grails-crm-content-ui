@@ -382,6 +382,48 @@ class CrmContentController {
         }
     }
 
+    /**
+     * Update properties on one or more CrmResourceRef instances.
+     *
+     * param (List) id instances to update
+     * param (String) newStatus sets the status
+     *
+     * @return
+     */
+    def updateAttachment() {
+        def idList = params.list('id')
+        def files = []
+
+        CrmResourceRef.withTransaction{
+            for(id in idList) {
+                def res = CrmResourceRef.findByIdAndTenantId(id, TenantUtils.tenant)
+                if (!res) {
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND)
+                    return
+                }
+                if(params.newStatus) {
+                    res.setStatusText(params.newStatus)
+                }
+                res.save()
+                files << res.name
+            }
+        }
+
+        if(request.xhr) {
+            def result = [files: files]
+            render result as JSON
+        } else {
+            flash.warning = message(code: 'crmResourceRef.updated.message',
+                    args: [message(code: 'crmResourceRef.label', default: 'Content'), files.join(', ')],
+                    default: "Resource [{1}] deleted")
+            if (params.referer) {
+                redirect(url: params.referer - request.contextPath)
+            } else {
+                redirect(controller: "crmFolder", action: "index")
+            }
+        }
+    }
+
     def deleteAttachment() {
         def idList = params.list('id')
         def files = []

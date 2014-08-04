@@ -1,3 +1,4 @@
+<%@ page import="grails.plugins.crm.content.CrmResourceRef" contentType="text/html;charset=UTF-8" %>
 <% if(multiple) { %>
 <r:require module="fileupload"/>
 <% } %>
@@ -36,6 +37,20 @@
             var check = $(this).is(":checked");
             var $table = $(this).closest('table');
             $(":checkbox[name='id']", $table).prop('checked', check);
+        });
+
+        $("#updateAttachment a").click(function(ev) {
+            ev.preventDefault();
+            if(! confirm("${message(code: 'crmContent.button.update.confirm.message', default: 'Confirm status update')}")) {
+                return;
+            }
+            var status = $(this).data('status');
+            var $form = $(this).closest('form');
+            var formData = $form.serialize();
+            formData = formData + '&newStatus=' + status;
+            $.post("${createLink(controller: 'crmContent', action: 'updateAttachment')}", formData, function(data) {
+                window.location.reload();
+            });
         });
     });
 </r:script>
@@ -100,6 +115,7 @@
             <g:hiddenField name="ref" value="${reference}"/>
             <g:hiddenField name="referer" value="${request.forwardURI + '#' + view.id}"/>
             <g:hiddenField name="status" value="${defaultStatus ?: ''}"/>
+
             <div class="form-actions btn-toolbar">
                 <crm:button type="link" group="true" controller="crmContent" action="create"
                             params="${[ref: reference, referer: request.forwardURI + '#' + view.id, contentType: 'text/html']}"
@@ -124,6 +140,25 @@
                 </crm:button>
 
                 <g:if test="${list}">
+                    <div class="btn-group">
+                        <a href="#" class="btn btn-warning">
+                            <i class="icon-adjust icon-white"></i>
+                            <g:message code="crmResourceRef.status.label" default="Status"/>
+                        </a>
+                        <button class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" id="updateAttachment">
+                            <g:each in="${CrmResourceRef.STATUS_TEXTS}" var="status">
+                            <li>
+                                <a href="#" data-id="${status.value}" data-status="${status.key}">
+                                    ${message(code: 'crmResourceRef.status.' + status.key, default: status.key)}
+                                </a>
+                            </li>
+                            </g:each>
+                        </ul>
+                    </div>
+
                     <crm:button action="deleteAttachment" group="true" visual="danger"
                                 label="crmContent.button.delete.label" icon="icon-trash icon-white"
                                 help="crmContent.button.delete.help"
