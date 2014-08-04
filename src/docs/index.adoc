@@ -109,6 +109,12 @@ The +create+ action takes a parameter +ref+ that should contain a *Reference Ide
 that the new content should be attached to.
 For example +crmContent/create?ref=crmResourceFolder@42+ would attach the newly created file to a folder with id 42.
 
+== Changes
+
+2.0.1:: Files can now be tagged (under content settings). +
+You can now update status on files directly from the embedded file list
+2.0.0:: First public release
+
 == License
 
 {license}
