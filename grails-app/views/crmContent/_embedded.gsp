@@ -75,6 +75,7 @@
             <tbody>
             <g:each in="${list}" var="res" status="i">
                 <g:set var="metadata" value="${res.metadata}"/>
+                <g:set var="tags" value="${res.getTagValue()}"/>
                 <tr class="status-${res.statusText} ${(i + 1) == params.int('selected') ? 'active' : ''}">
                     <td>
                         <img src="${crm.fileIcon(contentType: metadata.contentType)}" alt="${metadata.contentType}"
@@ -87,6 +88,9 @@
                     <td><g:formatDate date="${metadata.modified ?: metadata.created}" type="datetime"/></td>
                     <td>${metadata.size}</td>
                     <td style="text-align:right;">
+                        <g:if test="${tags}">
+                            <i class="icon-tag" title="${tags.join(', ')}"></i>
+                        </g:if>
                         <g:if test="${res.shared}">
                             <crm:resourceLink resource="${res}" target="_blank"><i
                                     class="icon-share-alt"></i></crm:resourceLink>
