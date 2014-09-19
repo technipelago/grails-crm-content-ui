@@ -358,6 +358,9 @@ class CrmContentController {
                         opts.status = 'published'
                     }
                     def resource = crmContentService.createResource(fileItem.inputStream, fileItem.originalFilename, fileItem.size, fileItem.contentType, instance, opts)
+                    for(tag in params.list('tags')) {
+                        resource.setTagValue(tag)
+                    }
                     files << [name: resource.name,
                         size: resource.metadata.bytes,
                         url: createLink(controller: 'crmContent', action: 'open', id: resource.id),
@@ -387,6 +390,9 @@ class CrmContentController {
                         opts.status = 'published'
                     }
                     resource = crmContentService.createResource(fileItem.inputStream, fileItem.originalFilename, fileItem.size, fileItem.contentType, instance, opts)
+                    for(tag in params.list('tags')) {
+                        resource.setTagValue(tag)
+                    }
                     flash.success = message(code: "crmContent.upload.success", args: [resource.toString()], default: "Resource [{0}] uploaded")
                 } catch (Exception e) {
                     log.error("Failed to upload file: ${fileItem.originalFilename}", e)
