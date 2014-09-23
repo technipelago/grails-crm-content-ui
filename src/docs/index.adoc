@@ -111,6 +111,7 @@ For example +crmContent/create?ref=crmResourceFolder@42+ would attach the newly 
 
 == Changes
 
+2.0.2:: Action `attachDocument` on `CrmContentController` can now tag uploaded files with the `tags` parameter
 2.0.1:: Files can now be tagged (under content settings). +
 You can now update status on files directly from the embedded file list
 2.0.0:: First public release
@@ -122,3 +123,9 @@ You can now update status on files directly from the embedded file list
 == Source Code
 
 The source code for this plugin is available at {gr8source}
+
+== Contributing
+
+Please report {gr8source}/issues[issues or suggestions].
+
+Want to improve the plugin: Fork the {gr8source}[repository] and send a pull request.
