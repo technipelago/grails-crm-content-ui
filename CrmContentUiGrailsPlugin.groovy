@@ -18,7 +18,7 @@ import grails.plugins.crm.content.CrmResourceRef
 
 class CrmContentUiGrailsPlugin {
     def groupId = ""
-    def version = "2.0.2-SNAPSHOT"
+    def version = "2.0.2"
     def grailsVersion = "2.2 > *"
     def dependsOn = [:]
     def loadAfter = ['crmContent']
