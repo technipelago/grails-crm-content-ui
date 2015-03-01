@@ -3,36 +3,45 @@ grails.project.test.class.dir = "target/test-classes"
 grails.project.test.reports.dir = "target/test-reports"
 grails.project.target.level = 1.6
 
+grails.project.fork = [
+    //  compile: [maxMemory: 256, minMemory: 64, debug: false, maxPerm: 256, daemon:true],
+    test: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, daemon:true],
+    run: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve:false],
+    war: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve:false],
+    console: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256]
+]
+
+grails.project.dependency.resolver = "maven"
 grails.project.dependency.resolution = {
-    inherits("global") {}
+    inherits "global"
     log "warn"
-    legacyResolve false
     repositories {
         grailsCentral()
+        mavenLocal()
+        mavenRepo "http://labs.technipelago.se/repo/plugins-releases-local/"
         mavenCentral()
     }
     dependencies {
-        compile "org.apache.ant:ant:1.8.2"
     }
+
     plugins {
-        build(":tomcat:$grailsVersion",
-                ":release:2.2.1",
+        build(":release:3.0.1",
                 ":rest-client-builder:1.0.3") {
             export = false
         }
-        runtime ":hibernate:$grailsVersion"
-
-        test(":spock:0.7") {
+        runtime(":hibernate4:4.3.6.1") {
+            excludes "net.sf.ehcache:ehcache-core"  // remove this when http://jira.grails.org/browse/GPHIB-18 is resolved
             export = false
-            exclude "spock-grails-support"
         }
-        test(":codenarc:0.21") { export = false }
-        test(":code-coverage:1.2.7") { export = false }
 
-        compile ":crm-content:2.0.3"
-        compile ":crm-ui-bootstrap:2.0.0"
+        test(":codenarc:0.22") { export = false }
+        test(":code-coverage:2.0.3-3") { export = false }
 
+        compile ":selection:0.9.8"
         compile ":decorator:1.1"
         compile ":ckeditor:4.4.1.0"
+
+        compile ":crm-content:2.4.0-SNAPSHOT"
+        compile ":crm-ui-bootstrap:2.4.0-SNAPSHOT"
     }
 }
