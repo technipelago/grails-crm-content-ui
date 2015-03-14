@@ -217,13 +217,13 @@
                         <span class="btn btn-primary fileinput-button">
                             <i class="icon-upload icon-white"></i>
                             <span><g:message code="crmContent.button.upload.label" default="Add files..."/></span>
-                            <input id="fileupload" type="file" name="file" style="margin-left:10px;" multiple="">
+                            <input id="fileupload" type="file" name="file" style="margin-left:6px;" multiple="">
                         </span>
                     </g:if>
                     <g:else>
                         <crm:button action="upload" visual="primary" icon="icon-upload icon-white"
                                     label="crmContent.button.upload.label"/>
-                        <input type="file" name="file" style="margin-left:10px;"/>
+                        <input type="file" name="file" style="width: 150px; margin-left:6px;"/>
                     </g:else>
 
                 </crm:hasPermission>
