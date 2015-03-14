@@ -18,7 +18,6 @@ grails.project.dependency.resolution = {
     repositories {
         grailsCentral()
         mavenLocal()
-        mavenRepo "http://labs.technipelago.se/repo/plugins-releases-local/"
         mavenCentral()
     }
     dependencies {
@@ -42,7 +41,7 @@ grails.project.dependency.resolution = {
         compile ":ckeditor:4.4.1.0"
         compile ":famfamfam:1.0.1"
 
-        compile ":crm-content:2.4.0-SNAPSHOT"
-        compile ":crm-ui-bootstrap:2.4.0-SNAPSHOT"
+        compile ":crm-content:2.4.0"
+        compile ":crm-ui-bootstrap:2.4.0"
     }
 }
