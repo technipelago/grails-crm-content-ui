@@ -16,6 +16,7 @@
 package grails.plugins.crm.content
 
 import grails.converters.JSON
+import grails.transaction.Transactional
 import org.springframework.web.context.request.RequestContextHolder
 
 import javax.servlet.http.HttpServletResponse
@@ -39,6 +40,7 @@ class CrmContentController {
     def crmContentService
     def userTagService
 
+    @Transactional
     def create(String ref, String referer, String contentType, String name, String text) {
         def reference = crmCoreService.getReference(ref)
         def css = grailsApplication.config.crm.content.editor.css
@@ -60,8 +62,8 @@ class CrmContentController {
         }
     }
 
+    @Transactional
     def edit() {
-
         def crmResourceRef = CrmResourceRef.findByIdAndTenantId(params.id, TenantUtils.tenant)
         if (!crmResourceRef) {
             flash.error = message(code: 'crmResourceRef.not.found.message', args: [message(code: 'crmResourceRef.label', default: 'Content'), params.id])
@@ -193,6 +195,7 @@ class CrmContentController {
                 metadata: crmResourceRef.metadata, css: css]
     }
 
+    @Transactional
     def delete(Long id) {
         def ref = CrmResourceRef.findByIdAndTenantId(id, TenantUtils.tenant)
         def parent
@@ -215,6 +218,7 @@ class CrmContentController {
         }
     }
 
+    @Transactional
     def createFavorite() {
         def crmResourceRef = CrmResourceRef.findByIdAndTenantId(params.id, TenantUtils.tenant)
         if (!crmResourceRef) {
@@ -227,6 +231,7 @@ class CrmContentController {
         redirect(action: 'show', id: params.id)
     }
 
+    @Transactional
     def deleteFavorite() {
         def crmResourceRef = CrmResourceRef.findByIdAndTenantId(params.id, TenantUtils.tenant)
         if (!crmResourceRef) {
@@ -322,6 +327,7 @@ class CrmContentController {
         (contentType == 'application/pdf') || contentType.startsWith('text') || contentType.startsWith('image')
     }
 
+    @Transactional
     def attachDocument(String ref) {
         def instance = crmCoreService.getReference(ref)
         if (instance && crmCoreService.isDomainClass(instance)) {
@@ -418,6 +424,7 @@ class CrmContentController {
      *
      * @return
      */
+    @Transactional
     def updateAttachment() {
         def idList = params.list('id')
         def files = []
@@ -452,6 +459,7 @@ class CrmContentController {
         }
     }
 
+    @Transactional
     def deleteAttachment() {
         def idList = params.list('id')
         def files = []
