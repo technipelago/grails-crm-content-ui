@@ -168,16 +168,16 @@
 
             <div class="form-actions btn-toolbar">
 
+                <crm:selectionMenu visual="primary">
+                    <crm:button action="index" icon="icon-search icon-white" visual="primary"
+                                label="crmContent.button.find.label"/>
+                </crm:selectionMenu>
+
                 <crm:button type="link" action="edit" id="${crmResourceFolder.id}" visual="warning"
                             icon="icon-pencil icon-white"
                             label="crmResourceFolder.button.edit.label"
                             title="crmResourceFolder.button.edit.help"
                             permission="crmContent:edit"/>
-
-                <crm:selectionMenu visual="primary">
-                    <crm:button action="index" icon="icon-search icon-white" visual="primary"
-                                label="crmContent.button.find.label"/>
-                </crm:selectionMenu>
 
                 <crm:button type="link" group="true" action="create" params="${['parent.id': crmResourceFolder.id]}"
                             visual="success"
@@ -211,6 +211,16 @@
                         </li>
                     </ul>
                 </crm:button>
+
+                <g:if test="${folders || files}">
+                    <crm:hasPermission permission="crmContent:archive">
+                        <g:link action="archive" id="${crmResourceFolder.id}" class="btn btn-info"
+                                title="${message(code: 'crmResourceFolder.button.archive.help', default: 'Create ZIP archive of this folder')}">
+                            <g:message code="crmResourceFolder.button.archive.label" default="Create archive"/>
+                        </g:link>
+                    </crm:hasPermission>
+                </g:if>
+
                 <crm:hasPermission permission="crmContent:edit">
 
                     <g:if test="${multiple}">
@@ -227,15 +237,6 @@
                     </g:else>
 
                 </crm:hasPermission>
-
-                <g:if test="${folders || files}">
-                    <crm:hasPermission permission="crmContent:archive">
-                        <g:link action="archive" id="${crmResourceFolder.id}"
-                                title="${message(code: 'crmResourceFolder.button.archive.help', default: 'Create ZIP archive of this folder')}">
-                            <g:message code="crmResourceFolder.button.archive.label" default="Create archive"/>
-                        </g:link>
-                    </crm:hasPermission>
-                </g:if>
 
             </div>
 
