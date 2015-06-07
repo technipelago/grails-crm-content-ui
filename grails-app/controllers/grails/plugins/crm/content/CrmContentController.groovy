@@ -74,12 +74,10 @@ class CrmContentController {
         def folder = (reference instanceof CrmResourceFolder) ? reference : null
         def folders = CrmResourceFolder.findAllByTenantId(TenantUtils.tenant).sort { it.path.join('/') }
         def css = grailsApplication.config.crm.content.editor.css
-        def childDocuments = crmContentService.findResourcesByReference(crmResourceRef)
-        def childReference = crmCoreService.getReferenceIdentifier(crmResourceRef)
         switch (request.method) {
             case 'GET':
                 return [crmResourceRef: crmResourceRef, metadata: crmContentService.getMetadata(crmResourceRef.resource),
-                        crmResourceFolder: folder, folders: folders, css: css, children: childDocuments, childReference: childReference]
+                        crmResourceFolder: folder, folders: folders, css: css]
             case 'POST':
                 if (params.version) {
                     def version = params.version.toLong()
@@ -88,7 +86,7 @@ class CrmContentController {
                                 [message(code: 'crmResourceRef.label', default: 'Content')] as Object[],
                                 "Another user has updated this content while you were editing")
                         render view: 'edit', model: [crmResourceRef: crmResourceRef, metadata: crmContentService.getMetadata(crmResourceRef.resource),
-                                crmResourceFolder: folder, folders: folders, css: css, children: childDocuments, childReference: childReference]
+                                crmResourceFolder: folder, folders: folders, css: css]
                         return
                     }
                 }
@@ -133,7 +131,7 @@ class CrmContentController {
 
                 if (!crmResourceRef.save(flush: true)) {
                     render view: 'edit', model: [crmResourceRef: crmResourceRef, metadata: crmContentService.getMetadata(crmResourceRef.resource),
-                            crmResourceFolder: folder, folders: folders, css: css, children: childDocuments, childReference: childReference]
+                            crmResourceFolder: folder, folders: folders, css: css]
                     return
                 }
 
@@ -192,8 +190,10 @@ class CrmContentController {
         }
         def reference = crmResourceRef.reference
         def folder = (reference instanceof CrmResourceFolder) ? reference : null
+        def childDocuments = crmContentService.findResourcesByReference(crmResourceRef)
+        def childReference = crmCoreService.getReferenceIdentifier(crmResourceRef)
         def css = grailsApplication.config.crm.content.editor.css
-        [crmResourceRef: crmResourceRef, crmResourceFolder: folder,
+        [crmResourceRef: crmResourceRef, crmResourceFolder: folder, children: childDocuments, childReference: childReference,
                 metadata: crmResourceRef.metadata, css: css]
     }
 
