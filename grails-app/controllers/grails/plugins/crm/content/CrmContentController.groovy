@@ -74,10 +74,12 @@ class CrmContentController {
         def folder = (reference instanceof CrmResourceFolder) ? reference : null
         def folders = CrmResourceFolder.findAllByTenantId(TenantUtils.tenant).sort { it.path.join('/') }
         def css = grailsApplication.config.crm.content.editor.css
+        def childDocuments = crmContentService.findResourcesByReference(crmResourceRef)
+        def childReference = crmCoreService.getReferenceIdentifier(crmResourceRef)
         switch (request.method) {
             case 'GET':
                 return [crmResourceRef: crmResourceRef, metadata: crmContentService.getMetadata(crmResourceRef.resource),
-                        crmResourceFolder: folder, folders: folders, css: css]
+                        crmResourceFolder: folder, folders: folders, css: css, children: childDocuments, childReference: childReference]
             case 'POST':
                 if (params.version) {
                     def version = params.version.toLong()
@@ -86,7 +88,7 @@ class CrmContentController {
                                 [message(code: 'crmResourceRef.label', default: 'Content')] as Object[],
                                 "Another user has updated this content while you were editing")
                         render view: 'edit', model: [crmResourceRef: crmResourceRef, metadata: crmContentService.getMetadata(crmResourceRef.resource),
-                                crmResourceFolder: folder, folders: folders, css: css]
+                                crmResourceFolder: folder, folders: folders, css: css, children: childDocuments, childReference: childReference]
                         return
                     }
                 }
@@ -131,7 +133,7 @@ class CrmContentController {
 
                 if (!crmResourceRef.save(flush: true)) {
                     render view: 'edit', model: [crmResourceRef: crmResourceRef, metadata: crmContentService.getMetadata(crmResourceRef.resource),
-                            crmResourceFolder: folder, folders: folders, css: css]
+                            crmResourceFolder: folder, folders: folders, css: css, children: childDocuments, childReference: childReference]
                     return
                 }
 
@@ -360,6 +362,8 @@ class CrmContentController {
                         opts.status = params.status
                     } else if ((instance instanceof CrmResourceFolder) && instance.shared) {
                         opts.status = 'shared'
+                    } else if (instance instanceof CrmResourceRef) {
+                        opts.status = instance.statusText // Same status as the parent/owner
                     } else {
                         opts.status = 'published'
                     }
@@ -392,6 +396,8 @@ class CrmContentController {
                         opts.status = params.status
                     } else if ((instance instanceof CrmResourceFolder) && instance.shared) {
                         opts.status = 'shared'
+                    } else if (instance instanceof CrmResourceRef) {
+                        opts.status = instance.statusText // Same status as the parent/owner
                     } else {
                         opts.status = 'published'
                     }
@@ -497,6 +503,7 @@ class CrmContentController {
 
     def browse(String reference, String pattern) {
         def domainInstance
+        def status = params.status
         if (reference) {
             domainInstance = crmCoreService.getReference(reference)
             if (!domainInstance) {
@@ -509,8 +516,19 @@ class CrmContentController {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND)
                 return
             }
+            if(! status) {
+                if(domainInstance instanceof CrmResourceRef) {
+                    status = domainInstance.statusText
+                }
+            }
         }
-        [reference: domainInstance, identifier: reference, pattern: pattern]
+        if(!status) {
+            status = 'published'
+        }
+        def referer = "${request.forwardURI - request.contextPath}?status=${status}" +
+                "&reference=${reference?.encodeAsIsoURL()}&pattern=${pattern ?: ''}&CKEditor=${params.CKEditor}" +
+                "&CKEditorFuncNum=${params.CKEditorFuncNum}&langCode=${params.langCode}".toString()
+        [reference: domainInstance, identifier: reference, pattern: pattern, referer: referer]
     }
 
     def tree(String reference, String pattern) {

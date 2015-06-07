@@ -49,12 +49,12 @@
 
             <g:uploadForm controller="crmContent" action="attachDocument">
                 <g:hiddenField name="ref" value="${identifier}"/>
-                <g:hiddenField name="status" value="${params.status ?: 'published'}"/>
+                <g:hiddenField name="status" value="${params.status}"/>
                 <g:hiddenField name="pattern" value="${pattern}"/>
                 <g:hiddenField name="CKEditor" value="${params.CKEditor}"/>
                 <g:hiddenField name="CKEditorFuncNum" value="${params.CKEditorFuncNum}"/>
                 <g:hiddenField name="langCode" value="${params.langCode}"/>
-                <g:hiddenField name="referer" value="${request.forwardURI - request.contextPath}?status=${params.status ?: 'published'}&reference=${identifier?.encodeAsIsoURL()}&pattern=${pattern ?: ''}&CKEditor=${params.CKEditor}&CKEditorFuncNum=${params.CKEditorFuncNum}&langCode=${params.langCode}"/>
+                <g:hiddenField name="referer" value="${raw(referer)}"/>
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary"><g:message code="crmContent.button.upload.label" default="Upload"/></button>
                     <input type="file" name="file"/>
