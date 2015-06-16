@@ -41,7 +41,7 @@ grails.project.dependency.resolution = {
         compile ":ckeditor:4.4.1.0"
         compile ":famfamfam:1.0.1"
 
-        compile ":crm-content:2.4.0"
+        compile ":crm-content:2.4.1"
         compile ":crm-ui-bootstrap:2.4.0"
     }
 }
