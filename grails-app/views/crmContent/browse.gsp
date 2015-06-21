@@ -17,6 +17,7 @@
                     var $label = $(this);
                     $("#content-list").html("<p>Loading...</p>");
                     $("#content-list").load("${createLink(action: 'files', params: [pattern: pattern])}", {reference: $label.attr('for')}, function() {
+                        $('input[name="ref"]').val($label.attr('for'));
                         $(".crm-filebrowser a").click(function(ev) {
                             ev.preventDefault();
                             select_file($(this).attr('href'));
