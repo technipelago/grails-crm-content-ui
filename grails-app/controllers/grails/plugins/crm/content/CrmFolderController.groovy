@@ -122,6 +122,9 @@ class CrmFolderController {
             } else if (fileItem) {
                 try {
                     def opts = [:]
+                    if(grailsApplication.config.crm.content.upload.opts instanceof Map) {
+                        opts.putAll(grailsApplication.config.crm.content.upload.opts)
+                    }
                     if (params.status) {
                         opts.status = params.status
                     } else if (crmResourceFolder.shared) {
