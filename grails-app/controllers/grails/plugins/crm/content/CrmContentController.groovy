@@ -248,61 +248,70 @@ class CrmContentController {
     def open(Long id) {
         def ref = CrmResourceRef.findByIdAndTenantId(id, TenantUtils.tenant)
         def status = HttpServletResponse.SC_NOT_FOUND
-        if (ref) {
-            try {
-                def metadata = ref.metadata
-                if (params.boolean('preview') && !isPreviewPossible(metadata.contentType)) {
-                    render(template: 'metadata', plugin: 'crm-content-ui', model: [metadata: metadata, crmResource: ref])
-                    return
+
+        if (!ref) {
+            response.sendError(status)
+            return
+        }
+
+        if(ref.shared) {
+            redirect uri: crm.createResourceLink(resource: ref)
+            return
+        }
+
+        try {
+            def metadata = ref.metadata
+            if (params.boolean('preview') && !isPreviewPossible(metadata.contentType)) {
+                render(template: 'metadata', plugin: 'crm-content-ui', model: [metadata: metadata, crmResource: ref])
+                return
+            }
+            def modified = ref.getLastModified()
+            modified = modified - (modified % 1000) // Remove milliseconds.
+            response.setContentType(metadata.contentType)
+            response.setDateHeader("Last-Modified", modified)
+            def requestETag = request.getHeader("ETag")
+            if (requestETag && (requestETag == metadata.hash)) {
+                if (log.isDebugEnabled()) {
+                    log.debug "Not modified (ETag)"
                 }
-                def modified = ref.getLastModified()
-                modified = modified - (modified % 1000) // Remove milliseconds.
-                response.setContentType(metadata.contentType)
-                response.setDateHeader("Last-Modified", modified)
-                def requestETag = request.getHeader("ETag")
-                if (requestETag && (requestETag == metadata.hash)) {
+                response.setStatus(HttpServletResponse.SC_NOT_MODIFIED)
+                response.outputStream.flush()
+                return
+            } else {
+                def ms = request.getDateHeader("If-Modified-Since")
+                if (modified <= ms) {
                     if (log.isDebugEnabled()) {
-                        log.debug "Not modified (ETag)"
+                        log.debug "Not modified (If-Modified-Since)"
                     }
                     response.setStatus(HttpServletResponse.SC_NOT_MODIFIED)
                     response.outputStream.flush()
                     return
-                } else {
-                    def ms = request.getDateHeader("If-Modified-Since")
-                    if (modified <= ms) {
-                        if (log.isDebugEnabled()) {
-                            log.debug "Not modified (If-Modified-Since)"
-                        }
-                        response.setStatus(HttpServletResponse.SC_NOT_MODIFIED)
-                        response.outputStream.flush()
-                        return
-                    }
                 }
-
-                def len = metadata.bytes
-                response.setContentLength(len.intValue())
-                response.setHeader("ETag", metadata.hash)
-
-                response.setContentLength(len.intValue())
-                def encoding = ref.encoding
-                if (encoding) {
-                    response.setCharacterEncoding(encoding)
-                }
-                response.setHeader("Content-disposition", "${params.disposition ?: 'inline'}; filename=${ref.name}; size=$len")
-                cacheThis(response, DEFAULT_CACHE_SECONDS, ref.shared)
-                def out = response.outputStream
-                ref.writeTo(out)
-                out.flush()
-                status = HttpServletResponse.SC_OK
-
-                def username = crmSecurityService.currentUser?.username
-                event(for: 'crmContent', topic: 'opened', data: [tenant: ref.tenantId, id: ref.id, user: username, name: ref.name])
-            } catch (SocketException e) {
-                log.error("Client aborted while opening resource: ${ref.resource}: ${e.message}")
-                status = HttpServletResponse.SC_NO_CONTENT
-            } catch (Exception e) {
-                log.error("Error while previewing resource: ${ref.resource}", e)
             }
+
+            def len = metadata.bytes
+            response.setContentLength(len.intValue())
+            response.setHeader("ETag", metadata.hash)
+
+            response.setContentLength(len.intValue())
+            def encoding = ref.encoding
+            if (encoding) {
+                response.setCharacterEncoding(encoding)
+            }
+            response.setHeader("Content-disposition", "${params.disposition ?: 'inline'}; filename=${ref.name}; size=$len")
+            cacheThis(response, DEFAULT_CACHE_SECONDS, ref.shared)
+            def out = response.outputStream
+            ref.writeTo(out)
+            out.flush()
+            status = HttpServletResponse.SC_OK
+
+            def username = crmSecurityService.currentUser?.username
+            event(for: 'crmContent', topic: 'opened', data: [tenant: ref.tenantId, id: ref.id, user: username, name: ref.name])
+        } catch (SocketException e) {
+            log.error("Client aborted while opening resource: ${ref.resource}: ${e.message}")
+            status = HttpServletResponse.SC_NO_CONTENT
+        } catch (Exception e) {
+            log.error("Error while previewing resource: ${ref.resource}", e)
         }
 
         if (status == HttpServletResponse.SC_OK) {
