@@ -24,7 +24,7 @@ import grails.plugins.crm.core.TenantUtils
 
 class CrmContentController {
 
-    static allowedMethods = [show: 'GET', open: 'GET', preview: 'GET', edit: ['GET', 'POST'], delete: ['POST','DELETE']]
+    static allowedMethods = [show: 'GET', open: 'GET', preview: 'GET', edit: ['GET', 'POST'], delete: ['POST', 'DELETE']]
 
     static WHITE_LIST = [
             'name',
@@ -47,7 +47,7 @@ class CrmContentController {
         switch (request.method) {
             case "GET":
                 [contentType: contentType, ref: ref, reference: reference, referer: referer, css: css,
-                 text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.']
+                 text       : 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.']
                 break
             case "POST":
                 if (!name) {
@@ -76,7 +76,7 @@ class CrmContentController {
         def css = grailsApplication.config.crm.content.editor.css
         switch (request.method) {
             case 'GET':
-                return [crmResourceRef: crmResourceRef, metadata: crmContentService.getMetadata(crmResourceRef.resource),
+                return [crmResourceRef   : crmResourceRef, metadata: crmContentService.getMetadata(crmResourceRef.resource),
                         crmResourceFolder: folder, folders: folders, css: css]
             case 'POST':
                 if (params.version) {
@@ -85,8 +85,8 @@ class CrmContentController {
                         crmResourceRef.errors.rejectValue('version', 'crmResourceRef.optimistic.locking.failure',
                                 [message(code: 'crmResourceRef.label', default: 'Content')] as Object[],
                                 "Another user has updated this content while you were editing")
-                        render view: 'edit', model: [crmResourceRef: crmResourceRef, metadata: crmContentService.getMetadata(crmResourceRef.resource),
-                                crmResourceFolder: folder, folders: folders, css: css]
+                        render view: 'edit', model: [crmResourceRef   : crmResourceRef, metadata: crmContentService.getMetadata(crmResourceRef.resource),
+                                                     crmResourceFolder: folder, folders: folders, css: css]
                         return
                     }
                 }
@@ -130,29 +130,29 @@ class CrmContentController {
                 }
 
                 if (!crmResourceRef.save(flush: true)) {
-                    render view: 'edit', model: [crmResourceRef: crmResourceRef, metadata: crmContentService.getMetadata(crmResourceRef.resource),
-                            crmResourceFolder: folder, folders: folders, css: css]
+                    render view: 'edit', model: [crmResourceRef   : crmResourceRef, metadata: crmContentService.getMetadata(crmResourceRef.resource),
+                                                 crmResourceFolder: folder, folders: folders, css: css]
                     return
                 }
 
                 def existing = crmResourceRef.getTagValue()
                 def tags = params.tags
-                if(tags) {
+                if (tags) {
                     tags = tags.split(',').findAll { it.trim() } // Convert to list with non-empty elements
                     // Removed tags
-                    for(t in existing) {
-                        if(! tags.contains(t)) {
+                    for (t in existing) {
+                        if (!tags.contains(t)) {
                             crmResourceRef.deleteTagValue(t)
                         }
                     }
-                    for(t in tags) {
-                        if(! existing.contains(t)) {
+                    for (t in tags) {
+                        if (!existing.contains(t)) {
                             crmResourceRef.setTagValue(t)
                         }
                     }
-                } else if(existing) {
-                     // Delete all existing tags
-                    for(t in existing) {
+                } else if (existing) {
+                    // Delete all existing tags
+                    for (t in existing) {
                         crmResourceRef.deleteTagValue(t)
                     }
                 }
@@ -168,6 +168,9 @@ class CrmContentController {
                 }
 
                 if (!flash.error) {
+                    def username = crmSecurityService.currentUser?.username
+                    def updateEvent = [tenant: crmResourceRef.tenantId, id: crmResourceRef.id, user: username, name: crmResourceRef.name]
+                    event(for: "crmResourceRef", topic: "updated", data: updateEvent)
                     flash.success = message(code: 'crmResourceRef.updated.message', args: [message(code: 'crmResourceRef.label', default: 'Content'), crmResourceRef.toString()])
                 }
                 if (params.stay) {
@@ -194,7 +197,7 @@ class CrmContentController {
         def childReference = crmCoreService.getReferenceIdentifier(crmResourceRef)
         def css = grailsApplication.config.crm.content.editor.css
         [crmResourceRef: crmResourceRef, crmResourceFolder: folder, children: childDocuments, childReference: childReference,
-                metadata: crmResourceRef.metadata, css: css]
+         metadata      : crmResourceRef.metadata, css: css]
     }
 
     @Transactional
@@ -254,7 +257,7 @@ class CrmContentController {
             return
         }
 
-        if(ref.shared) {
+        if (ref.shared) {
             redirect uri: crm.createResourceLink(resource: ref)
             return
         }
@@ -358,7 +361,7 @@ class CrmContentController {
             return
         }
 
-        if(request.xhr) {
+        if (request.xhr) {
             def files = []
             def fileItem = request.getFile("file")
             if (fileItem?.isEmpty()) {
@@ -377,15 +380,15 @@ class CrmContentController {
                         opts.status = 'published'
                     }
                     def resource = crmContentService.createResource(fileItem.inputStream, fileItem.originalFilename, fileItem.size, fileItem.contentType, instance, opts)
-                    for(tag in params.list('tags')) {
+                    for (tag in params.list('tags')) {
                         resource.setTagValue(tag)
                     }
-                    files << [name: resource.name,
-                        size: resource.metadata.bytes,
-                        url: createLink(controller: 'crmContent', action: 'open', id: resource.id),
-                        thumbnailUrl: createLink(controller: 'crmContent', action: 'open', id: resource.id),
-                        deleteUrl: createLink(controller: 'crmContent', action: 'deleteAttachment', id: resource.id),
-                        deleteType: "DELETE"
+                    files << [name        : resource.name,
+                              size        : resource.metadata.bytes,
+                              url         : createLink(controller: 'crmContent', action: 'open', id: resource.id),
+                              thumbnailUrl: createLink(controller: 'crmContent', action: 'open', id: resource.id),
+                              deleteUrl   : createLink(controller: 'crmContent', action: 'deleteAttachment', id: resource.id),
+                              deleteType  : "DELETE"
                     ]
                 } catch (Exception e) {
                     files << [name: fileItem.originalFilename, size: fileItem.size, error: e.message]
@@ -411,7 +414,7 @@ class CrmContentController {
                         opts.status = 'published'
                     }
                     resource = crmContentService.createResource(fileItem.inputStream, fileItem.originalFilename, fileItem.size, fileItem.contentType, instance, opts)
-                    for(tag in params.list('tags')) {
+                    for (tag in params.list('tags')) {
                         resource.setTagValue(tag)
                     }
                     flash.success = message(code: "crmContent.upload.success", args: [resource.toString()], default: "Resource [{0}] uploaded")
@@ -444,14 +447,14 @@ class CrmContentController {
         def idList = params.list('id')
         def files = []
 
-        CrmResourceRef.withTransaction{
-            for(id in idList) {
+        CrmResourceRef.withTransaction {
+            for (id in idList) {
                 def res = CrmResourceRef.findByIdAndTenantId(id, TenantUtils.tenant)
                 if (!res) {
                     response.sendError(HttpServletResponse.SC_NOT_FOUND)
                     return
                 }
-                if(params.newStatus) {
+                if (params.newStatus) {
                     res.setStatusText(params.newStatus)
                 }
                 res.save()
@@ -459,7 +462,7 @@ class CrmContentController {
             }
         }
 
-        if(request.xhr) {
+        if (request.xhr) {
             def result = [files: files]
             render result as JSON
         } else {
@@ -479,7 +482,7 @@ class CrmContentController {
         def idList = params.list('id')
         def files = []
 
-        for(id in idList) {
+        for (id in idList) {
             def res = CrmResourceRef.findByIdAndTenantId(id, TenantUtils.tenant)
             if (!res) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND)
@@ -490,8 +493,8 @@ class CrmContentController {
             files << filename
         }
 
-        if(request.xhr) {
-            def result = [files: files.collect{[(it): true]}]
+        if (request.xhr) {
+            def result = [files: files.collect { [(it): true] }]
             render result as JSON
         } else {
             flash.warning = message(code: 'crmResourceRef.deleted.message',
@@ -525,13 +528,13 @@ class CrmContentController {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND)
                 return
             }
-            if(! status) {
-                if(domainInstance instanceof CrmResourceRef) {
+            if (!status) {
+                if (domainInstance instanceof CrmResourceRef) {
                     status = domainInstance.statusText
                 }
             }
         }
-        if(!status) {
+        if (!status) {
             status = 'published'
         }
         def referer = "${request.forwardURI - request.contextPath}?status=${status}" +
@@ -604,7 +607,9 @@ class CrmContentController {
         } else {
             filter = { true }
         }
-        def files = crmContentService.findResourcesByReference(domainInstance).findAll(filter).findAll{ it.shared || (it.published && (it.tenantId == tenant)) }
+        def files = crmContentService.findResourcesByReference(domainInstance).findAll(filter).findAll {
+            it.shared || (it.published && (it.tenantId == tenant))
+        }
         def path = crmContentService.getAbsolutePath(domainInstance)
         if (path) {
             path = path.split('/')
@@ -624,8 +629,8 @@ class CrmContentController {
             json {
                 def result = files.collect { ref ->
                     def md = ref.metadata
-                    def result = [id: ref.id, name: ref.name, title: ref.title, base: baseUrl, path: path, bytes: md.bytes, size: md.size,
-                            contentType: md.contentType, status: ref.statusText, modified: md.modified]
+                    def result = [id         : ref.id, name: ref.name, title: ref.title, base: baseUrl, path: path, bytes: md.bytes, size: md.size,
+                                  contentType: md.contentType, status: ref.statusText, modified: md.modified]
                     def ctrl
                     if (domainInstance instanceof CrmResourceFolder) {
                         if (!(domainInstance.sharedPath || ref.shared || (ref.published && (ref.tenantId == tenant)))) {
