@@ -87,6 +87,8 @@ class BootStrap {
 <4> Find existing files attached to the domain instance so the inserted view/tab can list them.
 <5> The +model+ Closure have access to page scope in crmContact/show.gsp and can therefore reference the domain instance *crmContact*.
 
+When content is uploaded the status is set to 'shared' by default. This can be changed with the config parameter 'crm.content.upload.opts'.
+
 === Working with folders and files
 
 +crmFolder/list.gsp+
@@ -109,8 +111,175 @@ The +create+ action takes a parameter +ref+ that should contain a *Reference Ide
 that the new content should be attached to.
 For example +crmContent/create?ref=crmResourceFolder@42+ would attach the newly created file to a folder with id 42.
 
+== Extensions
+
+Like most {gr8crm} plugins the crm-content plugin trigger events when important things happens in the system,
+when content is created, updated, deleted, etc. These events can be used to extend functionality. By listening to events
+in your application service and take actions. The following example shows how you can scale and crop images automatically
+when uploaded to a folder tagged with a dimension tag. The program Imagemagick is used on the server to scale images.
+
+Example: If you add a tag with the name *1024x768* to a folder. Then all images uploaded to that folder will be resized
+to 1024x768 pixels in a "smart way", always trying to keep as much as possible of the image and focusing on the middle.
+The Imagemagick command *convert* is used on the server with the following options:
+
+    -resize <width>x<height>^
+    -gravity center
+    -crop <width>x<height>+0+0
+    +repage
+    -quality 50
+
+Here is the complete source for the service that listens for crmContent.created events and perform the resizing.
+
+[source,groovy]
+.CrmContentResizingService
+----
+package my.company
+
+import grails.events.Listener
+import grails.plugins.crm.core.Pair
+
+import java.util.concurrent.TimeUnit
+import java.util.regex.Pattern
+
+/**
+ * Scale uploaded images automatically.
+ */
+class CrmContentResizingService {
+
+    def grailsApplication
+    def crmContentService
+    def crmTagService
+
+    private static final DIMENSION_PATTERN = Pattern.compile(/(\d+)x(\d+)/)
+
+    @Listener(namespace = 'crmContent', topic = 'created')
+    def contentCreated(data) {
+        filter(data)
+    }
+
+    @Listener(namespace = 'crmResourceRef', topic = 'updated')
+    def contentUpdated(data) {
+        filter(data)
+    }
+
+    private void filter(data) {
+        // [tenant: ref.tenantId, id: ref.id, user: username, name: ref.name]
+
+        String name = data.name ? data.name.toLowerCase() : ''
+        def image = name.endsWith('.png') || name.endsWith('.jpg') || name.endsWith('.gif')
+
+        Thread.sleep(2000) // Wait for the transaction to complete.
+
+        def file = crmContentService.getResourceRef(data.id) <1>
+        if (!file) {
+            log.error("No content found with id: ${data.id}")
+            return
+        }
+
+        if (!image) {
+            // The file name did not tell us it was an image, what about the mime type?
+            image = file.metadata.contentType.startsWith('image/')
+        }
+
+        if (image) {
+            def (width, height) = getDimensions(file)
+            if (width && height) {
+                resize(file, width, height)
+                crmTagService.setTagValue(file, "resized") <4>
+            }
+        }
+    }
+
+    /**
+     * Find a tag with the format <width>x<height> on the resource or the resource's owner.
+     *
+     * @param file CrmResourceRef instance
+     * @return width and height as a Pair, or 0x0 if no tags was found
+     */
+    private Pair<Integer, Integer> getDimensions(file) {
+        def tags = crmTagService.getTagValue(file, null)
+        if (tags) {
+            if (tags.contains("resized")) {
+                log.debug("File $file is already resized") <2>
+                return new Pair<>(0, 0)
+            }
+        } else {
+            def reference = file.reference
+            if (!reference) {
+                log.error("No instance found with reference: ${file.ref}")
+                return new Pair<>(0, 0)
+            }
+            tags = crmTagService.getTagValue(reference, null)
+        }
+
+        def width = 0
+        def height = 0
+        for (value in tags) {
+            def m = DIMENSION_PATTERN.matcher(value)
+            if (m.find()) { <3>
+                width = Integer.valueOf(m.group(1))
+                height = Integer.valueOf(m.group(2))
+                break
+            }
+        }
+
+        return new Pair<>(width, height)
+    }
+
+    /**
+     * convert in.jpg -resize "1920x1080^" -gravity center -crop 1920x1080+0+0 +repage -quality 50 out.jpg
+     * @param file file to resize
+     * @param width wanted width in pixels
+     * @param height wanted height in pixels
+     */
+    private void resize(file, int width, int height) {
+        final String command = grailsApplication.config.crm.content.convert.executable ?: "/usr/bin/convert"
+        final File infile = File.createTempFile("crm", '.' + file.ext)
+        final File outfile = File.createTempFile("crm", '.' + file.ext)
+
+        infile.deleteOnExit()
+        outfile.deleteOnExit()
+
+        try {
+            infile.withOutputStream { os ->
+                file.writeTo(os)
+            }
+            Process p = new ProcessBuilder().inheritIO().command(command, infile.absolutePath,
+                    "-resize", "${width}x${height}^",
+                    "-gravity", "center",
+                    "-crop", "${width}x${height}+0+0",
+                    "+repage",
+                    "-quality", "50",
+                    outfile.absolutePath).start()
+            p.waitFor(30, TimeUnit.SECONDS)
+            int exitValue = p.exitValue()
+            if (exitValue == 0) {
+                outfile.withInputStream { is ->
+                    crmContentService.updateResource(file, is) <5>
+                }
+                log.debug "File $file resized to ${width}x${height}"
+            } else {
+                log.error "Could not resize file $file, exit code: $exitValue"
+            }
+        } catch (Exception e) {
+            log.error("Failed to resize file", e)
+        } finally {
+            infile.delete()
+            outfile.delete()
+        }
+    }
+}
+----
+<1> Grab the uploaded/created image
+<2> If image is already resized we do nothing
+<3> If we find a tag with the form <width>x<height> we use the dimensions to scale the image
+<4> Add a tag to tell that this image was resized
+<5> Update the image, overwriting original content
+
 == Changes
 
+2.4.1:: Default options for uploaded content can now be configured with 'crm.content.upload.opts'. crmContent/open now redirect to public endpoint if content is public.
+2.4.0:: Grails 2.4.x compatibility.
 2.0.2:: Action `attachDocument` on `CrmContentController` can now tag uploaded files with the `tags` parameter
 2.0.1:: Files can now be tagged (under content settings). +
 You can now update status on files directly from the embedded file list
