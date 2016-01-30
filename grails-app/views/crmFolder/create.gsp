@@ -42,6 +42,7 @@
                                          input-placeholder="${message(code: 'crmResourceFolder.name.placeholder', default: '')}"/>
                 <f:field property="description" input-class="span8" input-rows="4"
                          input-placeholder="${message(code: 'crmResourceFolder.description.placeholder', default: '')}"/>
+                <f:field property="shared"/>
             </f:with>
 
             <div class="form-actions">
