@@ -55,7 +55,7 @@ class CrmGalleryController {
         def filter = crmContentService.getDefaultImageFilter()
         def photos = []
         for (name in filter) {
-            def tmp = crmContentService.findResourcesByReference(reference, [name: name, status: CrmResourceRef.STATUS_SHARED])
+            def tmp = crmContentService.findResourcesByReference(reference, [name: '*' + name, status: CrmResourceRef.STATUS_SHARED])
             if (tmp) {
                 photos.addAll(tmp)
             }
