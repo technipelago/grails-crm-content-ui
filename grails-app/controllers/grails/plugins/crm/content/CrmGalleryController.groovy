@@ -41,13 +41,25 @@ class CrmGalleryController {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN)
                 return
             }
-            def jpgs = crmContentService.findResourcesByReference(reference, [name: "*.jpg", status: CrmResourceRef.STATUS_SHARED])
-            def pngs = crmContentService.findResourcesByReference(reference, [name: "*.png", status: CrmResourceRef.STATUS_SHARED])
-            def photos = jpgs + pngs
+            def photos = getPhotos(reference)
             if (photos) {
-                return [bean: reference, result: photos.sort { it.name }]
+                def template = grailsApplication.config.crm.content.gallery.template ?: 'web/gallery.html'
+                def parser = grailsApplication.config.crm.content.gallery.parser ?: ''
+                return [tenant: t, bean: reference, result: photos.sort { it.name }, template: template, parser: parser]
             }
         }
         response.sendError(HttpServletResponse.SC_NOT_FOUND)
+    }
+
+    private List<CrmResourceRef> getPhotos(reference) {
+        def filter = crmContentService.getDefaultImageFilter()
+        def photos = []
+        for (name in filter) {
+            def tmp = crmContentService.findResourcesByReference(reference, [name: name, status: CrmResourceRef.STATUS_SHARED])
+            if (tmp) {
+                photos.addAll(tmp)
+            }
+        }
+        return photos
     }
 }

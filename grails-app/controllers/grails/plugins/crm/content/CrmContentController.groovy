@@ -576,11 +576,6 @@ class CrmContentController {
         }
     }
 
-    private boolean isImage(String name) {
-        name = name.toLowerCase()
-        name.endsWith('.png') || name.endsWith('.jpg') || name.endsWith('.gif')
-    }
-
     def files(String reference, String pattern) {
         def tenant = TenantUtils.tenant
         def domainInstance
@@ -601,7 +596,7 @@ class CrmContentController {
         }
         def filter
         if (pattern == 'image') {
-            filter = { isImage(it.name) }
+            filter = { crmContentService.isImage(it) }
         } else if (pattern) {
             filter = { it.name ==~ pattern }
         } else {

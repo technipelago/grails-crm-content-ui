@@ -25,12 +25,14 @@
 <div class="crm-gallery">
     <div class="row-fluid">
         <div class="span10 offset1">
-            <h1><g:message code="crmContent.photo.gallery.title" default="Gallery - {0}" args="${[bean]}"/></h1>
+            <crm:render template="${template}" parser="${parser}">
+                <h1><g:message code="crmContent.photo.gallery.title" default="Gallery - {0}" args="${[bean]}"/></h1>
+            </crm:render>
 
             <div id="links" class="row-fluid">
                 <g:each in="${result}" var="photo">
                     <crm:resourceLink resource="${photo}" title="${photo.title}">
-                        <crm:image resource="${photo}" width="160" height="120" alt="${photo.title}"/>
+                        <crm:image resource="${photo}" width="160" height="120" alt="${photo.title}" class="img-polaroid"/>
                     </crm:resourceLink>
                 </g:each>
             </div>
