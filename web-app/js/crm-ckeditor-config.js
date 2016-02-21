@@ -18,4 +18,8 @@ CKEDITOR.editorConfig = function( config ) {
     config.allowedContent = true;
     config.basicEntities = false;
     config.protectedSource = [/\[@link\s+[\s\S]*?\[\/@link\]/g, /\[#[\s\S]*?\]/g];
+    config.extraPlugins = 'fakeobjects,showprotected';
 };
+
+CKEDITOR.plugins.addExternal('fakeobjects', '../../../crm-content-ui-2.4.2-SNAPSHOT/js/ckeditor/plugins/fakeobjects/');
+CKEDITOR.plugins.addExternal('showprotected', '../../../crm-content-ui-2.4.2-SNAPSHOT/js/ckeditor/plugins/showprotected/');
