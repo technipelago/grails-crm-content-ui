@@ -34,11 +34,11 @@
                     baseHref: "${createLink(controller: 'static')}",
                     contentsCss: stylesheet,
                     filebrowserBrowseUrl: "${createLink(controller: 'crmContent', action: 'browse')}?status=${
-                crmResourceRef.statusText}&reference=crmResourceRef@${crmResourceRef.ident()}",
+                crmResourceRef.statusText}&reference=${crmResourceRef.ref}",
                     filebrowserUploadUrl: "${createLink(controller: 'crmContent', action: 'upload')}",
                     filebrowserImageBrowseUrl: "${
                 createLink(controller: 'crmContent', action: 'browse')}?pattern=image&status=${
-                crmResourceRef.statusText}&reference=crmResourceRef@${crmResourceRef.ident()}",
+                crmResourceRef.statusText}&reference=${crmResourceRef.ref}",
                     filebrowserImageUploadUrl: "${createLink(controller: 'crmContent', action: 'upload')}"
             });
         });
