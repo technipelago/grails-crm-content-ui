@@ -447,19 +447,17 @@ class CrmContentController {
         def idList = params.list('id')
         def files = []
 
-        CrmResourceRef.withTransaction {
-            for (id in idList) {
-                def res = CrmResourceRef.findByIdAndTenantId(id, TenantUtils.tenant)
-                if (!res) {
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND)
-                    return
-                }
-                if (params.newStatus) {
-                    res.setStatusText(params.newStatus)
-                }
-                res.save()
-                files << res.name
+        for (id in idList) {
+            def res = CrmResourceRef.findByIdAndTenantId(id, TenantUtils.tenant)
+            if (!res) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND)
+                return
             }
+            if (params.newStatus) {
+                res.setStatusText(params.newStatus)
+            }
+            res.save()
+            files << res.name
         }
 
         if (request.xhr) {

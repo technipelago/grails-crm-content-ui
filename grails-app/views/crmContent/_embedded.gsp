@@ -52,6 +52,12 @@
                 window.location.reload();
             });
         });
+
+        $('.crm-toggle').hover(function() {
+            $(this).children().toggle();
+        }, function() {
+            $(this).children().toggle();
+        });
     });
 </r:script>
 
@@ -61,7 +67,7 @@
         <table class="table table-striped">
             <g:if test="${list}">
                 <thead>
-                <th><g:message code="crmResourceRef.title.label" default="Title"/></th>
+                <th colspan="2"><g:message code="crmResourceRef.title.label" default="Title"/></th>
                 <th><g:message code="crmContent.modified.label" default="Modified"/></th>
                 <th><g:message code="crmContent.length.label" default="Size"/></th>
                 <th style="text-align:right;">
@@ -77,9 +83,20 @@
                 <g:set var="metadata" value="${res.metadata}"/>
                 <g:set var="tags" value="${res.getTagValue()}"/>
                 <tr class="status-${res.statusText} ${(i + 1) == params.int('selected') ? 'active' : ''}">
-                    <td>
-                        <img src="${crm.fileIcon(contentType: metadata.contentType)}" alt="${metadata.contentType}"
+                    <td style="width:18px;" class="crm-toggle">
+                        <crm:hasPermission permission="${controllerName + ':edit'}">
+                            <g:link controller="crmContent" action="edit"
+                                    params="${[id: res.id, referer: request.forwardURI + '#' + view.id]}"
+                                    title="${message(code: 'crmContent.edit.help', default: 'Edit Document')}" class="hide">
+                                <i class="icon-pencil"></i>
+                            </g:link>
+                        </crm:hasPermission>
+                        <a href="#">
+                            <img src="${crm.fileIcon(contentType: metadata.contentType)}" alt="${metadata.contentType}"
                              title="${metadata.contentType}"/>
+                        </a>
+                    </td>
+                    <td>
                         <g:link controller="crmContent" action="open" id="${res.id}" target="${controllerName}_doc"
                                 title="${message(code: 'crmContent.open.help', default: 'Open Document')}">
                             ${res.title.encodeAsHTML()}
@@ -93,14 +110,9 @@
                         </g:if>
                         <g:if test="${res.shared}">
                             <crm:resourceLink resource="${res}" target="_blank"><i
-                                    class="icon-share-alt"></i></crm:resourceLink>
+                                    class="icon-share"></i></crm:resourceLink>
                         </g:if>
                         <crm:hasPermission permission="${controllerName + ':edit'}">
-                            <g:link controller="crmContent" action="edit"
-                                    params="${[id: res.id, referer: request.forwardURI + '#' + view.id]}"
-                                    title="${message(code: 'crmContent.edit.help', default: 'Edit Document')}">
-                                <i class="icon-pencil"></i>
-                            </g:link>
                             <input type="checkbox" name="id" value="${res.id}"
                                    style="vertical-align: top;margin-left: 3px;"/>
                         </crm:hasPermission>

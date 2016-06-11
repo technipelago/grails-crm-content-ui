@@ -1,4 +1,4 @@
-<%@ page import="grails.plugins.crm.content.CrmResourceFolder" %><!DOCTYPE html>
+<%@ page import="grails.plugins.crm.content.CrmResourceRef; grails.plugins.crm.content.CrmResourceFolder" %><!DOCTYPE html>
 <html>
 <head>
     <meta name="layout" content="main">
@@ -44,11 +44,36 @@
             var $table = $(this).closest('table');
             $(":checkbox[name='id']", $table).prop('checked', check);
         });
+
+        $("#updateAttachment a").click(function(ev) {
+            ev.preventDefault();
+            if(! confirm("${message(code: 'crmContent.button.update.confirm.message', default: 'Confirm status update')}")) {
+                return;
+            }
+            var status = $(this).data('status');
+            var $form = $('#updateForm');
+            var formData = $form.serialize();
+            formData = formData + '&newStatus=' + status;
+            $.post("${createLink(controller: 'crmContent', action: 'updateAttachment')}", formData, function(data) {
+                window.location.reload();
+            });
+        });
+
+        $('.crm-toggle').hover(function() {
+            $(this).children().toggle();
+        }, function() {
+            $(this).children().toggle();
+        });
     });
     </r:script>
 </head>
 
 <body>
+
+<g:set var="editPermission" value="${false}"/>
+<crm:hasPermission permission="${controllerName + ':edit'}">
+    <g:set var="editPermission" value="${true}"/>
+</crm:hasPermission>
 
 <div class="row-fluid">
     <div class="span9">
@@ -76,87 +101,118 @@
             </div>
         </g:if>
 
-        <table id="file-list" class="table table-striped">
-            <thead>
-            <th><g:message code="crmResourceFolder.title.label" default="Title"/></th>
-            <th><g:message code="crmResourceFolder.name.label" default="Name"/></th>
-            <th><g:message code="crmContent.modified.label" default="Modified"/></th>
-            <th style="text-align: right;"><g:message code="crmContent.length.label" default="Size"/></th>
-            <th></th>
-            </thead>
-            <tbody>
+        <g:form controller="crmContent" name="updateForm">
 
-            <g:if test="${crmResourceFolder.parent}">
-                <tr>
-                    <td>
-                        <img src="${fam.icon(name: 'arrow_turn_left')}"/>
-                        <g:link action="show" id="${crmResourceFolder.parent.id}">
-                            <g:fieldValue bean="${crmResourceFolder}" field="parent.title"/>
-                        </g:link>
-                    </td>
-                    <td colspan="3">
-                        <g:fieldValue bean="${crmResourceFolder}" field="parent.name"/>
-                    </td>
-                    <td>
-                        <g:if test="${crmResourceFolder.parent.shared}"><i class="icon-share"></i></g:if>
-                    </td>
-                </tr>
-            </g:if>
+            <table id="file-list" class="table table-striped">
+                <thead>
+                <th colspan="2"><g:message code="crmResourceFolder.title.label" default="Title"/></th>
+                <th><g:message code="crmResourceFolder.name.label" default="Name"/></th>
+                <th><g:message code="crmContent.modified.label" default="Modified"/></th>
+                <th style="text-align: right;"><g:message code="crmContent.length.label" default="Size"/></th>
+                <th style="width: 18px; text-align:right;"></th>
+                <g:if test="${editPermission && files}">
+                    <th style="width: 18px; text-align:right;">
+                        <input type="checkbox" id="select-all-files" name="selectall" value="*"
+                               style="vertical-align: top;"/>
+                    </th>
+                </g:if>
+                </thead>
 
-            <g:if test="${folders.isEmpty() && files.isEmpty()}">
-                <tr>
-                    <td colspan="5"><g:message code="crmResourceFolder.empty.message" default="Folder is empty"/></td>
-                </tr>
-            </g:if>
-
-            <g:each in="${folders}" var="folder" status="i">
-                <tr>
-                    <td class="nowrap">
-                        <img src="${fam.icon(name: 'folder')}"/>
-                        <g:link action="show" id="${folder.id}">${folder.title.encodeAsHTML()}</g:link>
-                    </td>
-                    <td colspan="3">
-                        <g:link action="show" id="${folder.id}">${folder.name?.encodeAsHTML()}</g:link>
-                    </td>
-                    <td><g:if test="${folder.shared}"><i class="icon-share"></i></g:if></td>
-                </tr>
-            </g:each>
-
-            <g:each in="${files}" var="res" status="i">
-                <g:set var="metadata" value="${res.metadata}"/>
-                <tr>
-                    <td class="nowrap">
-                        <img src="${crm.fileIcon(contentType: metadata.contentType)}"
-                             alt="${metadata.contentType}" title="${metadata.contentType}"/>
-                        <g:link controller="crmContent" action="open" id="${res.id}" target="${controllerName}_doc"
-                                title="${message(code: 'crmContent.open.help', default: 'Open Document')}">
-                            ${res.title.encodeAsHTML()}
-                        </g:link>
-                    </td>
-                    <td>
-                        ${res.name?.encodeAsHTML()}
-                    </td>
-                    <td class="nowrap"><g:formatDate date="${metadata.modified ?: metadata.created}"
-                                                     type="datetime"/></td>
-                    <td class="nowrap" style="text-align: right;">${metadata.size}</td>
-                    <td>
-                        <g:if test="${res.shared}">
-                            <crm:resourceLink resource="${res}" target="_blank"><i
-                                    class="icon-share-alt"></i></crm:resourceLink>
-                        </g:if>
-                        <crm:hasPermission permission="${controllerName + ':edit'}">
-                            <g:link controller="crmContent" action="edit"
-                                    params="${[id: res.id, referer: request.forwardURI]}"
-                                    title="${message(code: 'crmContent.edit.help', default: 'Edit Document')}">
-                                <i class="icon-pencil"></i>
+                <tbody>
+                <g:if test="${crmResourceFolder.parent}">
+                    <tr>
+                        <td style="width:18px;">
+                            <img src="${fam.icon(name: 'arrow_turn_left')}"/>
+                        </td>
+                        <td>
+                            <g:link action="show" id="${crmResourceFolder.parent.id}">
+                                <g:fieldValue bean="${crmResourceFolder}" field="parent.title"/>
                             </g:link>
-                        </crm:hasPermission>
-                    </td>
-                </tr>
-            </g:each>
-            </tbody>
-        </table>
+                        </td>
+                        <td colspan="3">
+                            <g:fieldValue bean="${crmResourceFolder}" field="parent.name"/>
+                        </td>
+                        <td style="width: 18px; text-align:right;">
+                            <g:if test="${crmResourceFolder.parent.shared}"><i class="icon-share"></i></g:if>
+                        </td>
+                        <g:if test="${editPermission && files}">
+                            <td style="width: 18px; text-align:right;"></td>
+                        </g:if>
+                    </tr>
+                </g:if>
 
+                <g:if test="${folders.isEmpty() && files.isEmpty()}">
+                    <tr>
+                        <td colspan="${editPermission ? 7 : 6}"><g:message code="crmResourceFolder.empty.message"
+                                                                           default="Folder is empty"/></td>
+                    </tr>
+                </g:if>
+
+                <g:each in="${folders}" var="folder" status="i">
+                    <tr>
+                        <td style="width:18px;">
+                            <img src="${fam.icon(name: 'folder')}"/>
+                        </td>
+                        <td class="nowrap">
+                            <g:link action="show" id="${folder.id}">${folder.title.encodeAsHTML()}</g:link>
+                        </td>
+                        <td colspan="3">
+                            <g:link action="show" id="${folder.id}">${folder.name?.encodeAsHTML()}</g:link>
+                        </td>
+                        <td style="width: 18px; text-align:right;">
+                            <g:if test="${folder.shared}"><i class="icon-share"></i></g:if>
+                        </td>
+                        <g:if test="${editPermission && files}">
+                            <td style="width: 18px; text-align:right;"></td>
+                        </g:if>
+                    </tr>
+                </g:each>
+
+                <g:each in="${files}" var="res" status="i">
+                    <g:set var="metadata" value="${res.metadata}"/>
+                    <tr>
+                        <td style="width:18px;" class="crm-toggle">
+                            <g:if test="${editPermission}">
+                                <g:link controller="crmContent" action="edit"
+                                        params="${[id: res.id, referer: request.forwardURI]}" class="hide"
+                                        title="${message(code: 'crmContent.edit.help', default: 'Edit Document')}">
+                                    <i class="icon-pencil"></i>
+                                </g:link>
+                            </g:if>
+                            <a href="#">
+                                <img src="${crm.fileIcon(contentType: metadata.contentType)}"
+                                     alt="${metadata.contentType}" title="${metadata.contentType}"/>
+                            </a>
+                        </td>
+                        <td class="nowrap">
+                            <g:link controller="crmContent" action="open" id="${res.id}" target="${controllerName}_doc"
+                                    title="${message(code: 'crmContent.open.help', default: 'Open Document')}">
+                                ${res.title.encodeAsHTML()}
+                            </g:link>
+                        </td>
+                        <td>
+                            ${res.name?.encodeAsHTML()}
+                        </td>
+                        <td class="nowrap"><g:formatDate date="${metadata.modified ?: metadata.created}"
+                                                         type="datetime"/></td>
+                        <td class="nowrap" style="text-align: right;">${metadata.size}</td>
+                        <td style="width: 18px; text-align:right;">
+                            <g:if test="${res.shared}">
+                                <crm:resourceLink resource="${res}" target="_blank"><i
+                                        class="icon-share"></i></crm:resourceLink>
+                            </g:if>
+                        </td>
+                        <g:if test="${editPermission}">
+                            <td style="width: 18px; text-align:right;">
+                                <input type="checkbox" name="id" value="${res.id}"
+                                       style="vertical-align: top;"/>
+                            </td>
+                        </g:if>
+                    </tr>
+                </g:each>
+                </tbody>
+            </table>
+        </g:form>
 
         <div id="progress" class="progress progress-info progress-striped hide">
             <div class="bar" style="width: 0%;"></div>
@@ -173,11 +229,27 @@
                                 label="crmContent.button.find.label"/>
                 </crm:selectionMenu>
 
-                <crm:button type="link" action="edit" id="${crmResourceFolder.id}" visual="warning"
-                            icon="icon-pencil icon-white"
-                            label="crmResourceFolder.button.edit.label"
-                            title="crmResourceFolder.button.edit.help"
-                            permission="crmContent:edit"/>
+                <div class="btn-group">
+                    <crm:button type="link" action="edit" id="${crmResourceFolder.id}" visual="warning"
+                                icon="icon-pencil icon-white"
+                                label="crmResourceFolder.button.edit.label"
+                                title="crmResourceFolder.button.edit.help"
+                                permission="crmContent:edit"/>
+                    <g:if test="${files}">
+                        <button class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" id="updateAttachment">
+                            <g:each in="${CrmResourceRef.STATUS_TEXTS}" var="status">
+                                <li>
+                                    <a href="#" data-id="${status.value}" data-status="${status.key}">
+                                        ${message(code: 'crmResourceRef.status.' + status.key, default: status.key)}
+                                    </a>
+                                </li>
+                            </g:each>
+                        </ul>
+                    </g:if>
+                </div>
 
                 <crm:button type="link" group="true" action="create" params="${['parent.id': crmResourceFolder.id]}"
                             visual="success"
@@ -221,7 +293,7 @@
                     </crm:hasPermission>
                 </g:if>
 
-                <crm:hasPermission permission="crmContent:edit">
+                <g:if test="${editPermission}">
 
                     <g:if test="${multiple}">
                         <span class="btn btn-primary fileinput-button">
@@ -236,7 +308,7 @@
                         <input type="file" name="file" style="width: 150px; margin-left:6px;"/>
                     </g:else>
 
-                </crm:hasPermission>
+                </g:if>
 
             </div>
 
