@@ -111,7 +111,7 @@
                 <th style="text-align: right;"><g:message code="crmContent.length.label" default="Size"/></th>
                 <th style="width: 18px; text-align:right;"></th>
                 <g:if test="${editPermission && files}">
-                    <th style="width: 18px; text-align:right;">
+                    <th style="text-align:right;">
                         <input type="checkbox" id="select-all-files" name="selectall" value="*"
                                style="vertical-align: top;"/>
                     </th>
@@ -136,7 +136,7 @@
                             <g:if test="${crmResourceFolder.parent.shared}"><i class="icon-share"></i></g:if>
                         </td>
                         <g:if test="${editPermission && files}">
-                            <td style="width: 18px; text-align:right;"></td>
+                            <td style="text-align:right;"></td>
                         </g:if>
                     </tr>
                 </g:if>
@@ -163,13 +163,14 @@
                             <g:if test="${folder.shared}"><i class="icon-share"></i></g:if>
                         </td>
                         <g:if test="${editPermission && files}">
-                            <td style="width: 18px; text-align:right;"></td>
+                            <td style="text-align:right;"></td>
                         </g:if>
                     </tr>
                 </g:each>
 
                 <g:each in="${files}" var="res" status="i">
                     <g:set var="metadata" value="${res.metadata}"/>
+                    <g:set var="tags" value="${res.getTagValue()}"/>
                     <tr>
                         <td style="width:18px;" class="crm-toggle">
                             <g:if test="${editPermission}">
@@ -197,13 +198,16 @@
                                                          type="datetime"/></td>
                         <td class="nowrap" style="text-align: right;">${metadata.size}</td>
                         <td style="width: 18px; text-align:right;">
+                            <g:if test="${tags}">
+                                <i class="icon-tag" title="${tags.join(', ')}"></i>
+                            </g:if>
                             <g:if test="${res.shared}">
                                 <crm:resourceLink resource="${res}" target="_blank"><i
                                         class="icon-share"></i></crm:resourceLink>
                             </g:if>
                         </td>
                         <g:if test="${editPermission}">
-                            <td style="width: 18px; text-align:right;">
+                            <td style="text-align:right;">
                                 <input type="checkbox" name="id" value="${res.id}"
                                        style="vertical-align: top;"/>
                             </td>
