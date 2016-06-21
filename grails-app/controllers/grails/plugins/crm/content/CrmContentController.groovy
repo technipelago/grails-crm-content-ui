@@ -17,6 +17,7 @@ package grails.plugins.crm.content
 
 import grails.converters.JSON
 import grails.transaction.Transactional
+import org.apache.commons.lang.StringUtils
 import org.springframework.web.context.request.RequestContextHolder
 
 import javax.servlet.http.HttpServletResponse
@@ -44,10 +45,21 @@ class CrmContentController {
     def create(String ref, String referer, String contentType, String name, String text) {
         def reference = crmCoreService.getReference(ref)
         def css = grailsApplication.config.crm.content.editor.css
+
         switch (request.method) {
             case "GET":
+                def filenames
+                def defaultText
+                if(contentType) {
+                    String subtype = StringUtils.substringAfter(contentType, '/')
+                    filenames = grailsApplication.config.crm.content.editor.filenames."$subtype"
+                    defaultText = grailsApplication.config.crm.content.editor.text."$subtype" ?: ''
+                } else {
+                    filenames = grailsApplication.config.crm.content.editor.filenames.default
+                    defaultText = grailsApplication.config.crm.content.editor.text.default ?: ''
+                }
                 [contentType: contentType, ref: ref, reference: reference, referer: referer, css: css,
-                 text       : 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.']
+                 text       : defaultText, filenames: filenames]
                 break
             case "POST":
                 if (!name) {

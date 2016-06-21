@@ -111,6 +111,30 @@ The +create+ action takes a parameter +ref+ that should contain a *Reference Ide
 that the new content should be attached to.
 For example +crmContent/create?ref=crmResourceFolder@42+ would attach the newly created file to a folder with id 42.
 
+== Configuration
+
+.Pre-defined list of file names
+
+When saving a text or html document it's sometimes nessecary to enter a file name that matches some functionality.
+For example *index.html* for web pages. You can help the user by supplying a list of file names to use when saving the document.
+
+    crm.content.editor.filenames.html = ['index.html': 'Home page in default language', 'index_sv.html': 'Home page in Swedish']
+    crm.content.editor.filenames.plain = ['data.csv': 'Comma separated data']
+
+image::editor-filenames.png[title="File name suggestions"]
+
+.Default content when creating new documents
+
+You can initialize new files with some text.
+
+    crm.content.editor.text.plain = 'Enter your plain text here...'
+    crm.content.editor.text.html = '<p>Enter your rich text here...</p>'
+    crm.content.editor.text.default = 'Lorem ipsum...'
+
+.Extra CSS in rich text editor
+
+    crm.content.editor.css = 'path to css file'
+
 == Extensions
 
 Like most {gr8crm} plugins the crm-content plugin trigger events when important things happens in the system,
