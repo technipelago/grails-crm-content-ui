@@ -24,8 +24,8 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        build(":release:3.0.1",
-                ":rest-client-builder:1.0.3") {
+        build(":release:3.1.2",
+                ":rest-client-builder:2.1.1") {
             export = false
         }
         runtime(":hibernate4:4.3.6.1") {
@@ -33,7 +33,7 @@ grails.project.dependency.resolution = {
             export = false
         }
 
-        test(":codenarc:0.24.1") { export = false }
+        test(":codenarc:0.25.2") { export = false }
         test(":code-coverage:2.0.3-3") { export = false }
 
         compile ":selection:0.9.8"
@@ -41,8 +41,8 @@ grails.project.dependency.resolution = {
         compile ":ckeditor:4.5.4.0"
         compile ":famfamfam:1.0.1"
 
-        compile ":crm-content:2.4.4-SNAPSHOT"
-        compile ":crm-ui-bootstrap:2.4.1"
+        compile ":crm-content:2.4.4"
+        compile ":crm-ui-bootstrap:2.4.2"
     }
 }
 
