@@ -18,7 +18,8 @@ import grails.plugins.crm.content.CrmResourceRef
 
 class CrmContentUiGrailsPlugin {
     def groupId = ""
-    def version = "2.4.3"
+    // TODO When version number is updated you MUST also update version number in web-app/js/crm-ckeditor-config.js
+    def version = "2.4.4"
     def grailsVersion = "2.4 > *"
     def dependsOn = [:]
     def loadAfter = ['crmContent']
