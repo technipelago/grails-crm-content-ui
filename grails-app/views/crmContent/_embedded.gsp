@@ -61,6 +61,17 @@
     });
 </r:script>
 
+<style type="text/css">
+    .crm-toggle img {
+        max-width: none;
+    }
+</style>
+
+<g:set var="editPermission" value="${false}"/>
+<crm:hasPermission permission="${controllerName + ':edit'}">
+    <g:set var="editPermission" value="${true}"/>
+</crm:hasPermission>
+
 <div id="crm-content-list">
     <g:uploadForm controller="crmContent">
 
@@ -71,10 +82,10 @@
                 <th><g:message code="crmContent.modified.label" default="Modified"/></th>
                 <th><g:message code="crmContent.length.label" default="Size"/></th>
                 <th style="text-align:right;">
-                    <crm:hasPermission permission="${controllerName + ':edit'}">
+                    <g:if test="${editPermission}">
                         <input type="checkbox" id="select-all-files" name="selectall" value="*"
                                style="vertical-align: top;margin-left: 3px;"/>
-                    </crm:hasPermission>
+                    </g:if>
                 </th>
                 </thead>
             </g:if>
@@ -84,13 +95,13 @@
                 <g:set var="tags" value="${res.getTagValue()}"/>
                 <tr class="status-${res.statusText} ${(i + 1) == params.int('selected') ? 'active' : ''}">
                     <td style="width:18px;" class="crm-toggle">
-                        <crm:hasPermission permission="${controllerName + ':edit'}">
+                        <g:if test="${editPermission}">
                             <g:link controller="crmContent" action="edit"
                                     params="${[id: res.id, referer: request.forwardURI + '#' + view.id]}"
                                     title="${message(code: 'crmContent.edit.help', default: 'Edit Document')}" class="hide">
                                 <i class="icon-pencil"></i>
                             </g:link>
-                        </crm:hasPermission>
+                        </g:if>
                         <a href="#">
                             <img src="${crm.fileIcon(contentType: metadata.contentType)}" alt="${metadata.contentType}"
                              title="${metadata.contentType}"/>
@@ -112,17 +123,17 @@
                             <crm:resourceLink resource="${res}" target="_blank"><i
                                     class="icon-share"></i></crm:resourceLink>
                         </g:if>
-                        <crm:hasPermission permission="${controllerName + ':edit'}">
+                        <g:if test="${editPermission}">
                             <input type="checkbox" name="id" value="${res.id}"
                                    style="vertical-align: top;margin-left: 3px;"/>
-                        </crm:hasPermission>
+                        </g:if>
                     </td>
                 </tr>
             </g:each>
             </tbody>
         </table>
 
-        <crm:hasPermission permission="${controllerName + ':edit'}">
+        <g:if test="${editPermission}">
 
             <div id="progress" class="progress progress-info progress-striped hide">
                 <div class="bar" style="width: 0%;"></div>
@@ -201,7 +212,7 @@
                     </g:link>
                 </g:if>
             </div>
-        </crm:hasPermission>
+        </g:if>
 
     </g:uploadForm>
 </div>

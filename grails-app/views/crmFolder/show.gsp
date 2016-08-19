@@ -66,6 +66,11 @@
         });
     });
     </r:script>
+    <style type="text/css">
+        .crm-toggle img {
+            max-width: none;
+        }
+    </style>
 </head>
 
 <body>
@@ -119,13 +124,15 @@
                 </thead>
 
                 <tbody>
-                <g:if test="${crmResourceFolder.parent}">
+                <g:if test="${crmResourceFolder.parentId}">
                     <tr>
                         <td style="width:18px;">
-                            <img src="${fam.icon(name: 'arrow_turn_left')}"/>
+                            <g:link action="show" id="${crmResourceFolder.parentId}">
+                                <i class="icon-step-backward"></i>
+                            </g:link>
                         </td>
                         <td>
-                            <g:link action="show" id="${crmResourceFolder.parent.id}">
+                            <g:link action="show" id="${crmResourceFolder.parentId}">
                                 <g:fieldValue bean="${crmResourceFolder}" field="parent.title"/>
                             </g:link>
                         </td>
@@ -175,7 +182,7 @@
                         <td style="width:18px;" class="crm-toggle">
                             <g:if test="${editPermission}">
                                 <g:link controller="crmContent" action="edit"
-                                        params="${[id: res.id, referer: request.forwardURI]}" class="hide"
+                                        params="${[id: res.id, referer: request.forwardURI]}" style="display: none;"
                                         title="${message(code: 'crmContent.edit.help', default: 'Edit Document')}">
                                     <i class="icon-pencil"></i>
                                 </g:link>
