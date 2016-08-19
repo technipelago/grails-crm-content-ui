@@ -21,5 +21,5 @@ CKEDITOR.editorConfig = function( config ) {
     config.extraPlugins = 'fakeobjects,showprotected';
 };
 
-CKEDITOR.plugins.addExternal('fakeobjects', '../../../crm-content-ui-2.4.2-SNAPSHOT/js/ckeditor/plugins/fakeobjects/');
-CKEDITOR.plugins.addExternal('showprotected', '../../../crm-content-ui-2.4.2-SNAPSHOT/js/ckeditor/plugins/showprotected/');
+CKEDITOR.plugins.addExternal('fakeobjects', '../../../crm-content-ui-2.4.3/js/ckeditor/plugins/fakeobjects/');
+CKEDITOR.plugins.addExternal('showprotected', '../../../crm-content-ui-2.4.3/js/ckeditor/plugins/showprotected/');

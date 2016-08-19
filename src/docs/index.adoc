@@ -302,6 +302,7 @@ class CrmContentResizingService {
 
 == Changes
 
+2.4.3:: Fixed wrong paths in `crm-ckeditor-config.js`.
 2.4.2:: UI tweaks. Edit button (pencil) is now hidden by default, visible by hovering the file icon in left column.
 2.4.1:: Default options for uploaded content can now be configured with 'crm.content.upload.opts'. crmContent/open now redirect to public endpoint if content is public.
 2.4.0:: Grails 2.4.x compatibility.
