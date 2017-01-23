@@ -313,7 +313,7 @@ class CrmContentController {
             if (encoding) {
                 response.setCharacterEncoding(encoding)
             }
-            response.setHeader("Content-disposition", "${params.disposition ?: 'inline'}; filename=${URLEncoder.encode(ref.name, 'UTF-8')}; size=$len")
+            response.setHeader("Content-Disposition", "${params.disposition ?: 'inline'}; filename=${CrmContentUtils.encodeFilename(ref.name)}; size=$len")
             cacheThis(response, DEFAULT_CACHE_SECONDS, ref.shared)
             def out = response.outputStream
             ref.writeTo(out)
