@@ -38,7 +38,7 @@
                     <td title="${content.path ? (content.path*.name).join('/') : ''}">
                         ${content.name.encodeAsHTML()}
                     </td>
-                    <td><g:if test="${content.folder && content.shared}"><i class="icon-share"></i></g:if></td>
+                    <td><g:if test="${content.folder && content.shared}"><i class="icon-globe"></i></g:if></td>
                 </tr>
             </g:each>
             </tbody>

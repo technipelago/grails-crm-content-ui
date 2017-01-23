@@ -119,9 +119,13 @@
                         <g:if test="${tags}">
                             <i class="icon-tag" title="${tags.join(', ')}"></i>
                         </g:if>
+                        <g:if test="${res.restricted}">
+                            <crm:resourceLink resource="${res}" target="_blank"><i
+                                    class="icon-adjust"></i></crm:resourceLink>
+                        </g:if>
                         <g:if test="${res.shared}">
                             <crm:resourceLink resource="${res}" target="_blank"><i
-                                    class="icon-share"></i></crm:resourceLink>
+                                    class="icon-globe"></i></crm:resourceLink>
                         </g:if>
                         <g:if test="${editPermission}">
                             <input type="checkbox" name="id" value="${res.id}"
@@ -169,7 +173,7 @@
                 <g:if test="${list}">
                     <div class="btn-group">
                         <a href="#" class="btn btn-warning">
-                            <i class="icon-adjust icon-white"></i>
+                            <i class="icon-cog icon-white"></i>
                             <g:message code="crmResourceRef.status.label" default="Status"/>
                         </a>
                         <button class="btn btn-warning dropdown-toggle" data-toggle="dropdown">

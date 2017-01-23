@@ -87,7 +87,7 @@
             <h1 title="${crmResourceFolder.path.join(' &raquo; ')}">
                 ${crmResourceFolder.title.encodeAsHTML()}
                 <crm:favoriteIcon bean="${crmResourceFolder}"/>
-                <g:if test="${crmResourceFolder.shared}"><i class="icon-share"></i></g:if>
+                <g:if test="${crmResourceFolder.shared}"><i class="icon-globe"></i></g:if>
                 <g:if test="${crmResourceFolder.parent}"><small>${crmResourceFolder.parent.path.join('/').encodeAsHTML()}</small></g:if>
             </h1>
         </header>
@@ -114,7 +114,7 @@
                 <th><g:message code="crmResourceFolder.name.label" default="Name"/></th>
                 <th><g:message code="crmContent.modified.label" default="Modified"/></th>
                 <th style="text-align: right;"><g:message code="crmContent.length.label" default="Size"/></th>
-                <th style="width: 18px; text-align:right;"></th>
+                <th style="width: 32px; text-align:right;"></th>
                 <g:if test="${editPermission && files}">
                     <th style="text-align:right;">
                         <input type="checkbox" id="select-all-files" name="selectall" value="*"
@@ -139,8 +139,8 @@
                         <td colspan="3">
                             <g:fieldValue bean="${crmResourceFolder}" field="parent.name"/>
                         </td>
-                        <td style="width: 18px; text-align:right;">
-                            <g:if test="${crmResourceFolder.parent.shared}"><i class="icon-share"></i></g:if>
+                        <td style="width: 32px; text-align:right;">
+                            <g:if test="${crmResourceFolder.parent.shared}"><i class="icon-globe"></i></g:if>
                         </td>
                         <g:if test="${editPermission && files}">
                             <td style="text-align:right;"></td>
@@ -166,8 +166,8 @@
                         <td colspan="3">
                             <g:link action="show" id="${folder.id}">${folder.name?.encodeAsHTML()}</g:link>
                         </td>
-                        <td style="width: 18px; text-align:right;">
-                            <g:if test="${folder.shared}"><i class="icon-share"></i></g:if>
+                        <td style="width: 32px; text-align:right;">
+                            <g:if test="${folder.shared}"><i class="icon-globe"></i></g:if>
                         </td>
                         <g:if test="${editPermission && files}">
                             <td style="text-align:right;"></td>
@@ -204,13 +204,17 @@
                         <td class="nowrap"><g:formatDate date="${metadata.modified ?: metadata.created}"
                                                          type="datetime"/></td>
                         <td class="nowrap" style="text-align: right;">${metadata.size}</td>
-                        <td style="width: 18px; text-align:right;">
+                        <td style="width: 32px; text-align:right;">
                             <g:if test="${tags}">
                                 <i class="icon-tag" title="${tags.join(', ')}"></i>
                             </g:if>
+                            <g:if test="${res.restricted}">
+                                <crm:resourceLink resource="${res}" target="_blank"><i
+                                        class="icon-adjust"></i></crm:resourceLink>
+                            </g:if>
                             <g:if test="${res.shared}">
                                 <crm:resourceLink resource="${res}" target="_blank"><i
-                                        class="icon-share"></i></crm:resourceLink>
+                                        class="icon-globe"></i></crm:resourceLink>
                             </g:if>
                         </td>
                         <g:if test="${editPermission}">
