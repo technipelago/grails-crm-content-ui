@@ -1,4 +1,4 @@
-<%@ page import="grails.plugins.crm.content.CrmResourceRef" contentType="text/html;charset=UTF-8" %>
+<%@ page import="org.codehaus.groovy.grails.commons.GrailsClassUtils; grails.plugins.crm.content.CrmResourceRef" contentType="text/html;charset=UTF-8" %>
 <% if(multiple) { %>
 <r:require module="fileupload"/>
 <% } %>
@@ -67,6 +67,7 @@
     }
 </style>
 
+<g:set var="shared" value="${false}"/>
 <g:set var="editPermission" value="${false}"/>
 <crm:hasPermission permission="${controllerName + ':edit'}">
     <g:set var="editPermission" value="${true}"/>
@@ -93,6 +94,9 @@
             <g:each in="${list}" var="res" status="i">
                 <g:set var="metadata" value="${res.metadata}"/>
                 <g:set var="tags" value="${res.getTagValue()}"/>
+                <g:if test="${res.shared}">
+                    <g:set var="shared" value="${true}"/>
+                </g:if>
                 <tr class="status-${res.statusText} ${(i + 1) == params.int('selected') ? 'active' : ''}">
                     <td style="width:18px;" class="crm-toggle">
                         <g:if test="${editPermission}">
@@ -209,14 +213,47 @@
                     <input type="file" name="file" style="margin-left:10px;"/>
                 </g:else>
 
-                <g:if test="${gallery && list}">
-                    <g:link mapping="gallery" class="btn btn-info" params="${gallery}">
-                        <i class="icon-picture icon-white"></i>
-                        <g:message code="crmContent.photo.gallery.label" default="Photo Gallery"/>
-                    </g:link>
+                <g:if test="${(linkParams && shared) || (gallery && list)}">
+                    <div class="btn-group">
+                        <button class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+                            <i class="icon-info-sign icon-white"></i>
+                            <g:message code="crmContent.button.view.label" default="View"/>
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <g:if test="${gallery && list}">
+                                <li>
+                                <g:link mapping="gallery" params="${gallery}">
+                                    <g:message code="crmContent.photo.gallery.label" default="Photo Gallery"/>
+                                </g:link>
+                                </li>
+                            </g:if>
+                            <g:if test="${linkParams && shared}">
+                                <li>
+                                <g:link mapping="${mapping ?: 'public-folder'}" params="${linkParams}" target="_blank">
+                                    <g:message code="crmContent.link.shared.label" default="Public folder"/>
+                                </g:link>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0)" onclick="copyFolderLinkToClipboard()">
+                                        <g:message code="crmContent.copy.to.clipboard.label" default="Share link to folder"/>
+                                    </a>
+                                </li>
+                            </g:if>
+                        </ul>
+                    </div>
                 </g:if>
             </div>
         </g:if>
 
     </g:uploadForm>
 </div>
+
+<r:script>
+<% if(shared) { %>
+    function copyFolderLinkToClipboard() {
+        var url = "${g.createLink(mapping: mapping ?: 'public-folder', params: linkParams, absolute: true)}";
+        window.prompt("${message(code: 'crmContent.copy.to.clipboard.message', 'Copy to clipboard: Ctrl+C, Enter')}", url);
+    }
+    <% } %>
+</r:script>
