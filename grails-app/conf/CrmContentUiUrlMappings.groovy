@@ -30,5 +30,9 @@ class CrmContentUiUrlMappings {
                 id(matches: /\d+/)
             }
         }
+        "/crmContent/templates.js" {
+            controller = 'crmContent'
+            action = 'ckEditorTemplates'
+        }
     }
 }

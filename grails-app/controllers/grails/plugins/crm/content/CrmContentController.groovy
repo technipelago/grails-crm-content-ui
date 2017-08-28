@@ -16,12 +16,13 @@
 package grails.plugins.crm.content
 
 import grails.converters.JSON
+import grails.plugins.crm.core.TenantUtils
+import grails.plugins.crm.core.WebUtils
 import grails.transaction.Transactional
 import org.apache.commons.lang.StringUtils
 import org.springframework.web.context.request.RequestContextHolder
 
 import javax.servlet.http.HttpServletResponse
-import grails.plugins.crm.core.TenantUtils
 
 class CrmContentController {
 
@@ -50,7 +51,7 @@ class CrmContentController {
             case "GET":
                 def filenames
                 def defaultText
-                if(contentType) {
+                if (contentType) {
                     String subtype = StringUtils.substringAfter(contentType, '/')
                     filenames = grailsApplication.config.crm.content.editor.filenames."$subtype"
                     defaultText = grailsApplication.config.crm.content.editor.text."$subtype" ?: ''
@@ -660,6 +661,20 @@ class CrmContentController {
                 }
                 render result as JSON
             }
+        }
+    }
+
+    private static final List<String> TEMPLATE_EXTENSIONS = ['html', 'htm', 'txt']
+
+    def ckEditorTemplates() {
+        def path = grailsApplication.config.crm.content.editor.templates ?: ('templates')
+        def folder = crmContentService.getFolder(path)
+        if (folder) {
+            def files = folder.getFiles().findAll { TEMPLATE_EXTENSIONS.contains(it.ext) }
+            WebUtils.defaultCache(response)
+            render(template: 'ckeditor', model: [files: files], contentType: 'text/javascript')
+        } else {
+            response.sendError(HttpServletResponse.SC_NO_CONTENT)
         }
     }
 }

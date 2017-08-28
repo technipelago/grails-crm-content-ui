@@ -1,4 +1,4 @@
-CKEDITOR.editorConfig = function( config ) {
+CKEDITOR.editorConfig = function (config) {
     config.width = '98.3%';
     config.height = '400px';
     config.resize_enabled = true;
@@ -12,14 +12,21 @@ CKEDITOR.editorConfig = function( config ) {
         ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent'],
         ['Image', 'Link', 'Unlink'],
         ['Table', 'HorizontalRule'],
+        ['Templates'],
         ['Undo', 'Redo'],
         ['Source']
     ];
     config.allowedContent = true;
     config.basicEntities = false;
     config.protectedSource = [/\[@link\s+[\s\S]*?\[\/@link\]/g, /\[#[\s\S]*?\]/g];
-    config.extraPlugins = 'fakeobjects,showprotected';
+    config.extraPlugins = 'fakeobjects,showprotected,templates';
+    config.templates_files = [
+        '../../crmContent/templates.js'
+    ];
+    config.templates = 'crm';
+    config.templates_replaceContent = false;
 };
 
 CKEDITOR.plugins.addExternal('fakeobjects', '../../../crm-content-ui-2.4.5-SNAPSHOT/js/ckeditor/plugins/fakeobjects/');
 CKEDITOR.plugins.addExternal('showprotected', '../../../crm-content-ui-2.4.5-SNAPSHOT/js/ckeditor/plugins/showprotected/');
+CKEDITOR.plugins.addExternal('templates', '../../../crm-content-ui-2.4.5-SNAPSHOT/js/ckeditor/plugins/templates/');
