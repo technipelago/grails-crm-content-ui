@@ -302,6 +302,7 @@ class CrmContentResizingService {
 
 == Changes
 
+2.4.5:: Content-Disposition filename is now URL encoded. Adds support for CKEditor templates plugin.
 2.4.4:: Fixed problem with file edit icon not rendered correct.
 2.4.3:: Fixed wrong paths in `crm-ckeditor-config.js`.
 2.4.2:: UI tweaks. Edit button (pencil) is now hidden by default, visible by hovering the file icon in left column.
