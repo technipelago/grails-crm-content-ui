@@ -84,11 +84,11 @@
     <div class="span9">
 
         <header class="page-header clearfix">
-            <h1 title="${crmResourceFolder.path.join(' &raquo; ')}">
-                ${crmResourceFolder.title.encodeAsHTML()}
+            <h1>
+                ${crmResourceFolder.title}
                 <crm:favoriteIcon bean="${crmResourceFolder}"/>
                 <g:if test="${crmResourceFolder.shared}"><i class="icon-globe"></i></g:if>
-                <g:if test="${crmResourceFolder.parent}"><small>${crmResourceFolder.parent.path.join('/').encodeAsHTML()}</small></g:if>
+                <small>${crmResourceFolder.path.join('/')}</small>
             </h1>
         </header>
 
