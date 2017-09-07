@@ -147,6 +147,15 @@
                         </g:if>
                     </tr>
                 </g:if>
+                <g:else>
+                    <tr>
+                        <td colspan="${editPermission && files ? 7 : 6}">
+                            <g:link action="list">
+                                <i class="icon-step-backward"></i>
+                            </g:link>
+                        </td>
+                    </tr>
+                </g:else>
 
                 <g:if test="${folders.isEmpty() && files.isEmpty()}">
                     <tr>
