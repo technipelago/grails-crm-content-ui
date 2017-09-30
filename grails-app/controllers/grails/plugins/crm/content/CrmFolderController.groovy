@@ -17,6 +17,8 @@ package grails.plugins.crm.content
 
 import javax.servlet.http.HttpServletResponse
 
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN
 import static javax.servlet.http.HttpServletResponse.SC_OK
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND
 
@@ -315,9 +317,33 @@ class CrmFolderController {
         }
         def newName = getUniqueName(crmResourceFolder.parent, crmResourceFolder.name)
         CrmResourceFolder newFolder = crmContentService.copy(crmResourceFolder, crmResourceFolder.parent,
-                newName, "Kopia av ${crmResourceFolder.title}")
+                newName, message(code: 'crmResourceRef.copy.name', args: ['', crmResourceFolder.title]))
         flash.success = message(code: 'crmResourceFolder.copied.message', args: [message(code: 'crmResourceFolder.label', default: 'Folder'), newFolder.name], default: "Folder copied to [{1}]. You are now looking at the new folder.")
         redirect(action: "show", id: newFolder.id)
+    }
+
+    def copyFiles() {
+        def tenant = TenantUtils.tenant
+        def ids = params.list('id')
+        def result = []
+        for(id in ids) {
+            def res = crmContentService.getResourceRef(id)
+            if(tenant != res?.tenantId) {
+                response.sendError(SC_FORBIDDEN)
+                return
+            }
+            def folder = res.reference
+            if(folder instanceof CrmResourceFolder) {
+                def copy = crmContentService.copy(res, folder,
+                        message(code: 'crmResourceRef.copy.name', args: ['', res.name]))
+                result.add(copy.dao)
+            } else {
+                response.sendError(SC_BAD_REQUEST)
+                return
+            }
+
+        }
+        render result as JSON
     }
 
     private String getUniqueName(CrmResourceFolder folder, String basename) {
@@ -332,9 +358,9 @@ class CrmFolderController {
             eq('name', name)
         }) {
             if (revision) {
-                name = "Kopia($revision) av $basename"
+                name = message(code: 'crmResourceRef.copy.name', args: [revision, basename])
             } else {
-                name = "Kopia av $basename"
+                name = message(code: 'crmResourceRef.copy.name', args: ['', basename])
             }
             revision++
         }

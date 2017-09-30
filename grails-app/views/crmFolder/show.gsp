@@ -59,6 +59,18 @@
             });
         });
 
+        $("#copyFiles").click(function(ev) {
+            ev.preventDefault();
+            if(! confirm("${message(code: 'crmResourceRef.button.copy.confirm', default: 'Confirm copy files')}")) {
+                return;
+            }
+            var $form = $('#updateForm');
+            var formData = $form.serialize();
+            $.post("${createLink(controller: 'crmFolder', action: 'copyFiles')}", formData, function(data) {
+                window.location.reload();
+            });
+        });
+
         $('.crm-toggle').hover(function() {
             $(this).children().toggle();
         }, function() {
@@ -290,6 +302,11 @@
                                     onclick="return confirm('Är du säker på att du vill kopiera denna mapp och allt dess innehåll till en ny mapp?')">
                                 <g:message code="crmFolder.button.copy.label" default="Copy Folder"/>
                             </g:link>
+                        </li>
+                        <li>
+                            <a href="#" id="copyFiles">
+                                ${message(code: 'crmResourceRef.button.copy.label', default: "Copy selected files")}
+                            </a>
                         </li>
                         <li>
                             <g:link controller="crmContent" action="create"
