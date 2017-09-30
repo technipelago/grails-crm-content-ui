@@ -36,7 +36,9 @@ class CrmFolderController {
             'name',
             'title',
             'description',
-            'shared'
+            'shared',
+            'iconName',
+            'uri'
     ]
 
     def grailsApplication

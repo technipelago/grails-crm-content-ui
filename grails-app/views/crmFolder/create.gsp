@@ -42,6 +42,10 @@
                                          input-placeholder="${message(code: 'crmResourceFolder.name.placeholder', default: '')}"/>
                 <f:field property="description" input-class="span8" input-rows="4"
                          input-placeholder="${message(code: 'crmResourceFolder.description.placeholder', default: '')}"/>
+                <f:field property="uri" input-class="span8"
+                         input-placeholder="${message(code: 'crmResourceFolder.uri.placeholder', default: '')}"/>
+                <f:field property="iconName" input-class="span8"
+                         input-placeholder="${message(code: 'crmResourceFolder.iconName.placeholder', default: '')}"/>
                 <f:field property="shared"/>
             </f:with>
 
