@@ -102,10 +102,19 @@
                 <g:if test="${crmResourceFolder.shared}"><i class="icon-globe"></i></g:if>
                 <small>${crmResourceFolder.path.join('/')}</small>
             </h1>
+
+            <g:if test="${crmResourceFolder.uri}">
+                <h2>${crmResourceFolder.uri}
+                <g:if test="${crmResourceFolder.iconName}">
+                    <small>${crmResourceFolder.iconName}</small>
+                </g:if>
+                </h2>
+            </g:if>
+
         </header>
 
         <g:if test="${crmResourceFolder.description}">
-            <p style="width: 60%;">
+            <p class="lead" style="width: 66%;">
                 <g:decorate include="abbreviate" max="500">
                     <g:fieldValue bean="${crmResourceFolder}" field="description"/>
                 </g:decorate>
