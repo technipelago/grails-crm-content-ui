@@ -27,6 +27,6 @@ CKEDITOR.editorConfig = function (config) {
     config.templates_replaceContent = false;
 };
 
-CKEDITOR.plugins.addExternal('fakeobjects', '../../../crm-content-ui-2.4.5/js/ckeditor/plugins/fakeobjects/');
-CKEDITOR.plugins.addExternal('showprotected', '../../../crm-content-ui-2.4.5/js/ckeditor/plugins/showprotected/');
-CKEDITOR.plugins.addExternal('templates', '../../../crm-content-ui-2.4.5/js/ckeditor/plugins/templates/');
+CKEDITOR.plugins.addExternal('fakeobjects', '../../../crm-content-ui-2.5.0/js/ckeditor/plugins/fakeobjects/');
+CKEDITOR.plugins.addExternal('showprotected', '../../../crm-content-ui-2.5.0/js/ckeditor/plugins/showprotected/');
+CKEDITOR.plugins.addExternal('templates', '../../../crm-content-ui-2.5.0/js/ckeditor/plugins/templates/');
